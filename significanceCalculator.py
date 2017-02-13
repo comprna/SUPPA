@@ -31,11 +31,11 @@ parser.add_argument('-p', '--psi',
                     dest="conds",
                     action="store",
                     nargs="+",
-                    help="Path of the conditions files. Conditions files and the transcript expression (TPM) files "
+                    help="Path of the PSI files. PSI files and the transcript expression (TPM) files "
                          "must have the same order."
                          "The conditions files and the tpm files must have the same order.")
 
-parser.add_argument('-e', '--expression-files',
+parser.add_argument('-e', '--tpm',
                     dest="tpms",
                     action="store",
                     nargs="+",
@@ -43,12 +43,12 @@ parser.add_argument('-e', '--expression-files',
                          "(TPM) files must have the same order."
                          "The conditions files and the tpm files must have the same order.")
 
-parser.add_argument('-i', '--ioe',
-                    dest="ioe",
+parser.add_argument('-i', '--input',
+                    dest="iox",
                     action="store",
                     nargs=1,
                     default=None,
-                    help="Input file with the event-transcripts equivalence (.ioe format)")
+                    help="Input file with the event-transcripts equivalence (.ioe or .ioi format)")
 
 parser.add_argument('-a', '--area',
                     dest="area",
@@ -86,12 +86,14 @@ parser.add_argument('-al', '--alpha',
                     default=[0.05],
                     help="Family-wise error rate to use for the multiple test correction. (Default: 0.05).")
 
-
 parser.add_argument('-o', '--output',
                     dest="output",
                     action="store",
                     default=None,
                     help="Name of the output files.")
+
+parser.add_argument("-mo", "--mode", default="INFO",
+                    help="to choose from DEBUG, INFO, WARNING, ERROR and CRITICAL")
 
 
 def create_path(lst):
@@ -111,13 +113,30 @@ def main():
 
     args = parser.parse_args()
 
+    # Parsing arguments
+    mode = "logging." + args.mode
+
+    # Setting logging preferences
+    logger = logging.getLogger(__name__)
+    logger.setLevel(eval(mode))
+
+    # Setting the level of the loggers in lib
+    # setToolsLoggerLevel(mode)
+
     # Check if path is absolute, if not the program use the current working path
     cond_files = create_path(args.conds)
     expr_files = create_path(args.tpms)
-    ioe_fl = create_path(args.ioe)
+    ioe_fl = create_path(args.iox)
 
-    multiple_conditions_analysis(args.method, cond_files, expr_files, ioe_fl[0], args.area[0],
-                                 args.lower_bound[0], args.paired, args.gene_cor, args.alpha[0], args.output)
+    # Check extension of input file
+    id_type = ioe_fl[0].split(".")[-1].strip("\n")
+    if id_type != "ioe" and id_type != "ioi":
+        logger.info("Invalid input file. Input file has to be either IOE or IOI format "
+                    "it must present the appropriate suffix.")
+        exit(1)
+
+    multiple_conditions_analysis(args.method, cond_files, expr_files, ioe_fl[0], args.area[0], args.lower_bound[0],
+                                 args.paired, args.gene_cor, args.alpha[0], args.output)
 
 if __name__ == "__main__":
     main()

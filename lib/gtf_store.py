@@ -231,3 +231,16 @@ def gtf_reader(parse_file, logger):
                 # results
                 all_results.append(results)
     return all_results
+
+
+def ioi_writer(genome_obj, output_file):
+
+    with open(output_file+".ioi", "w+") as fh:
+        for obj in genome_obj:
+            for trans_id in obj[0].transcripts.keys():
+                chrm = obj[1]
+                gene_id = obj[0].name
+                all_trans_ids = ",".join(obj[0].sortedTranscripts)
+                line = "%s\t%s\t%s\t%s\t%s\n" % \
+                       (chrm, gene_id, gene_id+";"+trans_id, trans_id, all_trans_ids)
+                fh.write(line)
