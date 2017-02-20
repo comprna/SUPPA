@@ -3,21 +3,22 @@
 ==========
 ----------------------------
 
-SUPPA is a tool to study splicing across multiple conditions at high speed and accuracy. The tool has four modular operations that are run separately to:
+SUPPA is a flexible and powerful tool to study splicing across multiple conditions at high speed and accuracy. 
+The tool has various modular operations that can be run separately to:
 
-- Generate local alternative splicing events and transcript events from an annotation
-- Quantify event inclusion levels (PSIs) from multiple samples
-- Calculate differential splicing across multiple conditions with replicates
-- Cluster events according to PSI values across conditions
+- Generate local alternative splicing (AS) events and transcript events from an annotation
+- Quantify transcript and AS event inclusion levels (PSIs) from multiple samples
+- Calculate differential splicing for events and differential transcript usage across multiple conditions with replicates
+- Cluster events and transcripts according to PSI values across conditions
 
 ![Slide1.jpg](https://bitbucket.org/repo/4gEBMd/images/3120745382-Slide1.jpg)
 
  
-**Fig 1.** SUPPA generates the different alternative splicing events from an input annotation file (GTF format). The method reads transcript and gene information solely from the "exon" lines in the GTF. It then generates the events and outputs an ioe file, which contains the for each event the transcripts that describe either form of the event. Specifically, it provides the transcripts that contribute to the numerator (one form of the event) and the denominator (both forms of the event) of the PSI calculation. For the generation of PSI values, SUPPA reads the ioe file generated in the previous step and a transcript expression file with the transcript abundances to calculate the PSI value for each of the events. 
+**Fig 1.** SUPPA generates the alternative splicing events from an input annotation file (GTF format). The method reads transcript and gene information solely from the "exon" lines in the GTF. It then generates the events and outputs an ioe file, which contains the for each event the transcripts that describe either form of the event. Specifically, it provides the transcripts that contribute to the numerator (one form of the event) and the denominator (both forms of the event) of the PSI calculation. For the generation of PSI values, SUPPA reads the ioe file generated in the previous step and a transcript expression file with the transcript abundances to calculate the PSI value for each of the events. 
 
 ![figure2_for_readme_bitbucket.jpg](https://bitbucket.org/repo/4gEBMd/images/612499447-figure2_for_readme_bitbucket.jpg)
 
-**Fig 2.** (a) SUPPA calculates the magnitude of splicing change (ΔPSI) and their significance across multiple biological conditions, using two or more replicates per condition. Conditions are analyzed in a sequential order specified as input. (b) Statistical significance is calculated by comparing the observed ΔPSI between conditions with the distribution of the ΔPSI between replicates as a function of the gene expression (measured as the expression of the transcripts defining the events). Alternatively, when there is a large (>10) number of replicates per condition, SUPPA can apply a classical statistical test (Wilcoxon) per event (not shown in the figure). (c) Using the output from the differential splicing analysis, SUPPA can also cluster events with similar splicing patterns using a density-based clustering algorithm.
+**Fig 2.** (a) SUPPA calculates the magnitude of splicing change (ΔPSI) (for events or transcripts) and its significance across multiple biological conditions, using two or more replicates per condition. Conditions are analyzed in a sequential order specified as input. (b) Statistical significance is calculated by comparing the observed ΔPSI between conditions with the distribution of the ΔPSI between replicates as a function of the expression of the transcripts defining the events (for events) or as a functon of the gene expression (for transcripts). When there is a large (>10) number of replicates per condition, you can also run SUPPA with a classical statistical test (Wilcoxon) per event or per transcsript (not shown in the figure). (c) Using the output from the differential splicing analysis, SUPPA can cluster events or transcripts with similar splicing patterns across conditions using a density-based clustering algorithm.
  
 We provide below detailed information on how to install and run SUPPA. Please join the SUPPA google-group for sharing your thoughts and questions (suppa-users@googlegroups.com). 
 
@@ -32,7 +33,7 @@ We provide below detailed information on how to install and run SUPPA. Please jo
 
 SUPPA has been developed in Python 3.4. 
 
-If necessary, to install python3 we recommend to download from the official site ( https://www.python.org/downloads/ ) the corresponding version for your OS.
+If necessary, to install python3 we recommend to download from the official site https://www.python.org/downloads/ the corresponding version for your OS.
 
 SUPPA uses the following modules:
 
@@ -78,9 +79,16 @@ where the subcommand can be one of these five:
 ==============
 ----------------------------
 
-SUPPA generates the different AS events from an input annotation file (GTF format). The method reads transcript and gene information solely from the "exon" lines. It then generates the events and outputs an ioe file. The ioe file provides for each AS event in a gene, the transcripts that describe either form of the event. Specifically, it provides the transcripts that contribute to the numerator (one form of the event) and the denominator (both forms of the event) of the PSI calculation. 
+SUPPA can work with local alternative splicing events or with transcripts "events" per gene. The local alternative splicing events are
+standard local splicing variations (see below), whereas a transcript event is an isoform-centric approach, where each isoform in a gene is described separately. 
 
-Different event types generated by SUPPA:
+SUPPA generates the AS events or transcript events from an input annotation file (GTF format). The method reads transcript and gene information solely from the "exon" lines. It then generates the events and outputs an event file: **.ioe** format for local AS events, and **.ioi** format for transcripts. 
+
+The ioe file provides for each AS event in a gene, the transcripts that describe either form of the event. Specifically, it provides the transcripts that contribute to the numerator (one form of the event) and the denominator (both forms of the event) of the PSI calculation. 
+
+The ioi file provides for each transcript in a gene, the set of all transcripts from that gene from which the transcript relative abundance is calculated. Transcript events are important as they can describe splicing variations that are complex and cannot be encapsulated in a simple event (see e.g. Sebestyen et al. NAR 2015).
+
+Different local event types generated by SUPPA:
 
 - Skipping Exon (SE)
 - Alternative 5'/3' Splice Sites (A5/A3)
@@ -114,7 +122,7 @@ chr14	Ensembl	exon	73753818	73754022	0.0 -	.	gene_id "ENSG00000000001"; transcri
 
 ```
 
-The *generateEvents* operation just uses the lines where the feature (column 3) is "exon". It then reads the different transcripts and genes. For that purpose "gene_id" and "transcript_id" tags are required in the attributes field (column 9). This command also generates a GTF file with the calculated events and with a track header ready to be uploaded into the UCSC browser for visualization (see below). 
+The *generateEvents* operation uses the lines where the feature (column 3) is "exon". It then reads the different transcripts and genes. For that purpose "gene_id" and "transcript_id" tags are required in the attributes field (column 9). For local AS events, this command also generates a GTF file with the calculated events and with a track header ready to be uploaded into the UCSC browser for visualization (see below). 
 
 ### **Command and options** ###
 
@@ -129,7 +137,14 @@ List of options available:
 
 - **-o**  | **--output-file**: name of the output file without any extension
 
-- **-e**  | **--event-type**: space separated list of events to generate from the following list:
+- **-f**  | **--format**: [ioe,ioi]
+  	  - Required. Format of the event annotation file: ioe for local events, ioi for transcript events.
+
+- **-p**  | **--pool-genes**: 
+  	  - Optional. Redefine genes by clustering together transcripts by genomic stranded overlap and sharing at least one exon.
+            It is crucial when creating ioe/ioi from annotations that are not loci-based, e.g.: RefSeq and UCSC genes.
+
+- **-e**  | **--event-type**: (only used for local AS events) space separated list of events to generate from the following list:
 
   - **SE**: Skipping exon (SE)
   - **SS**: Alternative 5' (A5) or 3' (A3) splice sites (generates both)
@@ -138,12 +153,12 @@ List of options available:
   - **FL**: Alternative First (AF) and Last (AL) exons (generates both)
 
 - **-b** | **--boundary**: [S,V]
-        - Boundary type. Options: S -- Strict (Default) V -- Variable
+        - Boundary type (only used for local AS events). Options: S -- Strict (Default) V -- Variable
 
 - **-t** | **--threshold**: THRESHOLD
-        - Variability treshold (Default: 10nt). In case of strict boundaries this argument is ignored
+        - Variability treshold (Default: 10nt. Only used forlocal AS events). In case of strict boundaries this argument is ignored
 
-- **-l**  | **--exon-length**: defines the number of nucleotides to display in the output GTF. (Default: 100 nt)
+- **-l**  | **--exon-length**: (only used for local AS events). Defines the number of nucleotides to display in the output GTF. (Default: 100 nt)
 
 - **-p**  | **--pool-genes**: pools together into a composite gene those transcripts overlapping in the same strand that share at least one splice site.
 
