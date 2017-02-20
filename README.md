@@ -5,7 +5,7 @@
 
 SUPPA is a tool to study splicing across multiple conditions at high speed and accuracy. The tool has four modular operations that are run separately to:
 
-- Generate events from an annotation
+- Generate local alternative splicing events and transcript events from an annotation
 - Quantify event inclusion levels (PSIs) from multiple samples
 - Calculate differential splicing across multiple conditions with replicates
 - Cluster events according to PSI values across conditions
