@@ -337,6 +337,8 @@ transcript3	<expression>	<expression>	<expression>	<expression>
 
 ### **PSI per transcript Isoform** ###
 
+At the moment the PSI per transcript isoform is calculated in the following way:
+
 ```
 suppa.py psiPerIsoform [options]
 ```
@@ -372,7 +374,7 @@ List of options available:
 
 - **-i** | **--ioe-file**: input file with the definition of the events and corresponding transcripts
 
-- **-f** | **--total-filter**: Minimum total expression of the transcripts involved in the event. If used, it will filter out the events that do not reach this total expression value for the transcripts defining the event (the denominator of the PSI calculation).
+- **-f** | **--total-filter**: Minimum total expression of the transcripts involved in the event (Default is zero). If used, it will filter out the events that do not reach this total expression value for the transcripts defining the event (the denominator of the PSI calculation).
 
 - **-o** | **--output-file**: output file name
 
@@ -416,7 +418,7 @@ ENSG00000000419.12;SE:chr20:50940933-50941105:50941209-50942031:-       0.023022
 ====================================
 ------------------------------------
 
-Transcript expression files used with SUPPA typically come from multiple calculations with different samples. To facilitate the generation of a single file with all the transcript expression values for all samples, SUPPA distribution includes a program to combine multiple simple transcript expression files into one single file:
+Transcript expression files used with SUPPA typically come from calculations with multiple samples. To facilitate the generation of a single file with all the transcript expression values for all samples, SUPPA distribution includes a program to combine multiple simple transcript expression files into one single file:
 
 ```
 suppa.py joinFiles [options]
@@ -444,18 +446,19 @@ The output will look like an expression file with multiple files as described ab
 
 **Important:** Right now this method assumes that the individual files have in the first column the IDs that are common across all files, and in the second column the PSI or TPM values to be joined. This will be changed in the future to a more flexible method so that generic tab separated files can be used directly. 
 
+
 -------------------
 **Differential splicing analysis**
 ==============
 -------------------
 
-SUPPA reads the PSI and transcript expression values from multiple samples, grouped by condition, and the ioe file, to calucate the events that are differentially spliced between a pair of conditions. SUPPA can test multiple conditions with a variabe number of samples per condition. 
+SUPPA reads the PSI for the (transcripts or local) events and the transcript expression values from multiple samples, grouped by condition, and the ioe/ioi file, to calucate the events that are differentially spliced between a pair of conditions. SUPPA can test multiple conditions with a variabe number of samples per condition. 
 
 ### **Input files** ###
 
-The **ioe** file, a **PSI** files and the **transcript expression** files are required.
+The **ioe/ioi** file, the **PSI** files and the **transcript expression** files are required.
 
-The PSI and transcript expression files are both tab separated files, where each line provides, respectively, the PSI values and the estimated abundance of each transcript. These files have to contain multiple columns with the PSI values and expression values in different samples, keeping the same ordering of samples in both files.
+The PSI and transcript expression files are both tab separated files, where each line provides the (transcript or local) event PSI values and the estimated abundance of each transcript, respectively. These files must contain multiple columns with the PSI values and expression values in the different samples, always keeping the same order of samples in both files.
 
 The PSI and transcript expression files must have a header with the sample names. For instance, the PSI file could look like this: 
 ```
@@ -465,7 +468,7 @@ event2	<psi_value>	<psi_value>	<psi_value>	<psi_value>
 event3	<psi_value>	<psi_value>	<psi_value>	<psi_value>
 ```
 
-and the transcript expression file could be of the form: 
+and the transcript expression file should be then of the form:
 
 ```
 sample1	sample2	sample3	sample4
@@ -473,26 +476,32 @@ transcript1	<expression>	<expression>	<expression>	<expression>
 transcript2	<expression>	<expression>	<expression>	<expression>
 transcript3	<expression>	<expression>	<expression>	<expression>
 ```
-where the expression values are ideally given in TPM units.
+
+where the expression values are given in TPM units.
 
 **Note:** these files have a header with only the sample names (1 less column)
 
 **Important:** SUPPA will read one PSI file and one transcript expression file per condition. Each of these files will contain the multiple replicates (or individual samples) that are grouped into a given condition, and the should be specified in the same order within the files.
+
+
+### **Differential splicing with transcript isoforms or Differential Transcript Usage (DTU)** ###
+
 
 ### **Command and options** ###
 To calculate the dpsi from the *ioe*, *psi* and the *expression file* one has to run the following command:
 ```
 suppa.py diffSplice [options]
 ```
+
 List of options available:
 
 - **-m** | **--method**: The method to use to calculate the significance (empirical/classical)
 
-- **-p** | **--psi**:  PSI files. The psi and expression files must be given in the same order.
+- **-p** | **--psi**:  PSI files. The psi and expression files per condition must be given in the same order.
 
-- **-e** | **--expression-files**: Transcript expression files. The expression files and PSI files must be given in the same order.
+- **-e** | **--tpm**: Transcript expression (TPM) files. The expression files and PSI files per condition must be in the same order.
 
-- **-i** | **--ioe**: File with the definition of the events
+- **-i** | **--input**: Input file with the local or transcript events, .ioe or .ioi format, respectively.
 
 - **-a** | **--area**: Integer indicating the number of points in the local area of the delta PSI - average TPM distribution. (Default: 1000).
 
@@ -508,42 +517,62 @@ List of options available:
 
 - **-h**  | **--help**: display the help message describing the different parameters
 
-An example of the usage of the program is:
+
+### **Differential transcript usage** ###
+
+An example of the usage of the program with transcripts is:
 
 ```
-suppa.py diffSplice --method <empirical> --ioe <ioe-file> --psi <Cond1.psi> <Cond2.psi> --expression-file <Cond1_expression-file> <Cond2_expression-file> --area <1000> --lower-bound <0.05> -gc -o <output-file>
+suppa.py diffSplice --method <empirical> --input <ioi-file> --psi <Cond1.psi> <Cond2.psi> --expression-file <Cond1_expression-file> <Cond2_expression-file> --area <1000> --lower-bound <0.05> -gc -o <output-file>
 ```
+
+### **Differential splicing with local events** ###
+
+An example of the usage of the program with local events is:
+
+```
+suppa.py diffSplice --method <empirical> --input <ioe-file> --psi <Cond1.psi> <Cond2.psi> --expression-file <Cond1_expression-file> <Cond2_expression-file> --area <1000> --lower-bound <0.05> -gc -o <output-file>
+```
+
 
 **Note:** ΔPSI values are calculated pairwise between each pair of adjacent conditions as provided, and calculating the PSI different between a given condition and the previous one. For instance, for three conditions 1,2,3, the ΔPSI values will be calculated for 3 - 2 and 2 - 1. 
 
 ### **Output files** ###
 
-The differential splicing operation generates a *dpsi* file and a *psivec* file. 
+The differential splicing operation generates a *dpsi* file and a *psivec* file for both cases, differential splicing of events and differential transcript usage.  
 
 
 **dpsi file**
 -------
 
-*dpsi* is a tab separated file, with the event ID in the first column, followed by a variable even number of fields, two for each pair of conditions being compared:
+*dpsi* is a tab separated file, with the (transcript or local) event ID in the first column, followed by a variable even number of fields, two for each pair of conditions being compared:
 
 
 1. **Cond1_Cond2_dPSI**: Event PSI difference (ΔPSI) between Cond2 and Cond1.
 
 2. **Cond1_Cond2_pvalue**: Significance of the difference of PSI between Cond2 and Cond1
 
-An example of an *dpsi* file is the following one:
+An example of a *dpsi* file for transcript events is the following one:
 ```
 Cond1_Cond2_dPSI	Cond1_Cond2_p-val
-ENSG00000000003;A5:chrX:99890743-99891188:99890743-99891605:-	nan	1.0
+ENSG00000000419.8;ENST00000413082.1	0.1204556785	0.0119388277
+ENSG00000000419.8;ENST00000371583.5	0.0940010396	0.0897896221
+ENSG00000000419.8;ENST00000494752.1	0.1904161332	0.2039492118
+```
+
+An example of a *dpsi* file for local events is the following one:
+```
+Cond1_Cond2_dPSI	Cond1_Cond2_p-val
 ENSG00000000419;A3:chr20:49557492-49558568:49557470-49558568:-	0.1307455855	0.0484515485
 ENSG00000000419;SE:chr20:49557470-49557642:49557746-49558568:-	0.0469449126	0.0954045953
 ENSG00000000419;SE:chr20:49557470-49557666:49557746-49558568:-	0.0164051352	0.1518481518
 ```
 
+
 **psivec file**
 -------
 
-*psivec* is a tab separated file, with the event ID in the first column, followed by a variable of fields, each giving the PSI value per replicate:
+*psivec* is a tab separated file, with the (transcript or local) event ID in the first column, followed by a variable number of fields, each giving the PSI value per replicate:
 
 
 1. **sample PSI**: PSI value for a given replicate/condition.
@@ -560,16 +589,18 @@ ENSG00000000419;A5:chr20:49557470-49557642:49557470-49557666:-	0.449504795764880
 
 **Note:** these files have a header with only the sample names (1 less column)
 
+
 -------------------
 **Cluster analysis**
 ==============
 -------------------
 
-Using the PSI values in all samples, and the information of which events change significantly in at least one comparison, SUPPA calculates clusters of events using a density-based clustering. Density-based clustering has the advantage that it can put together into the same cluster two events that even though they might not have similar PSI values, their behaviour is similar across conditions and there are sufficient events between them with a similar behaviour. 
+Using the relative abundances (PSI values) of (transcript or local) events in all samples, and the information of which events change significantly in at least one comparison, SUPPA calculates clusters of events using a density-based clustering. Density-based clustering has various advantages over other methods: it does not require to choose the number of clusters, as this is driven by the data; and it cluster together events that even though they might not have similar PSI values, they behave similarly across conditions as long as there are sufficient events between them.
+
 
 ### **Input files** ###
 
-An **dpsi** file and **psivec** file are required (see definitions above). The dpsi file contains the information about which events are signficantly differentially spliced in each pairwise comparison. For instance, a dpsi file with data from the comparison of three conditions will look like:
+A **dpsi** file and **psivec** file are required (see definitions above). The dpsi file contains the information about which events are signficantly differentially spliced in each pairwise comparison. For instance, a dpsi file with data from the comparison of three conditions will look like:
 ```
 Cond1_Cond2_dPSI	Cond1_Cond2_p-val	Cond2_Cond3_dPSI	Cond2_Cond3_p-val
 event1		<dpsi_value>		<dpsi_value>		<dpsi_value>		<dpsi_value>
