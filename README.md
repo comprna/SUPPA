@@ -484,9 +484,6 @@ where the expression values are given in TPM units.
 **Important:** SUPPA will read one PSI file and one transcript expression file per condition. Each of these files will contain the multiple replicates (or individual samples) that are grouped into a given condition, and the should be specified in the same order within the files.
 
 
-### **Differential splicing with transcript isoforms or Differential Transcript Usage (DTU)** ###
-
-
 ### **Command and options** ###
 To calculate the dpsi from the *ioe*, *psi* and the *expression file* one has to run the following command:
 ```
@@ -595,7 +592,7 @@ ENSG00000000419;A5:chr20:49557470-49557642:49557470-49557666:-	0.449504795764880
 ==============
 -------------------
 
-Using the relative abundances (PSI values) of (transcript or local) events in all samples, and the information of which events change significantly in at least one comparison, SUPPA calculates clusters of events using a density-based clustering. Density-based clustering has various advantages over other methods: it does not require to choose the number of clusters, as this is driven by the data; and it cluster together events that even though they might not have similar PSI values, they behave similarly across conditions as long as there are sufficient events between them.
+Using the relative abundances (PSI values) of (transcript or local) events in all samples, and the information of which events change significantly in at least one comparison, SUPPA calculates clusters of events using a density-based clustering. Density-based clustering has various advantages over other methods: it does not require to choose the number of clusters, as this is driven by the data; and it cluster together events that even though they might not have similar PSI values, they behave similarly across conditions as long as there are sufficient events between them. This function works in the same way for transcripts or for local alternative splicing events.
 
 
 ### **Input files** ###
@@ -682,6 +679,22 @@ ENSG00000005189;A5:chr16:20818139-20818274:20818027-20818274:+	0	0.344510537149	
 ENSG00000005189;SE:chr16:20851790-20855256:20855348-20855951:+	-1	0.853283401943	0.548674896371
 ENSG00000005194;SE:chr16:57463192-57464170:57464251-57466399:-	-1	0.971516032983	0.829712829609
 ```
+
+and similarly for transcript events:
+**Note:** The clustvec file doesn't contain a header. The header is for illustraion purpouse only. 
+```
+event_id	cluster_id	cond1_PSI_avg	cond2_PSI_avg
+ENSG00000133961.15;ENST00000556772.1 0    0.728937981178  0.223877291002  
+ENSG00000133961.15;ENST00000554818.1 1    0.041992298773  0.508135647228
+ENSG00000133961.15;ENST00000556600.1 -1   0.106752966827  0.127736627782
+```
+
+
+The cluster_id is 
+- **-1**: For unclustered events
+- **0,1,2,...**: For each of the clusters formed. Clusteres are numbered from zero. 
+
+
 
 ----------------------------
 **LICENSE**
