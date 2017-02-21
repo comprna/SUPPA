@@ -3,12 +3,11 @@
 ==========
 ----------------------------
 
-SUPPA is a flexible and powerful tool to study splicing across multiple conditions at high speed and accuracy. 
-The tool has various modular operations that can be run separately to:
+SUPPA is a flexible and powerful tool to study splicing at the transcript isoform or at the local alternative splicing event level, across multiple conditions, and at high speed and accuracy. SUPPA has various modular operations that can be run separately to:
 
-- Generate local alternative splicing (AS) events and transcript events from an annotation
-- Quantify transcript and AS event inclusion levels (PSIs) from multiple samples
-- Calculate differential splicing for events and differential transcript usage across multiple conditions with replicates
+- Generate transcript events and local alternative splicing (AS) events from an annotation
+- Quantify transcript and local AS event inclusion levels (PSIs) from multiple samples
+- Calculate differential splicing for AS events and differential transcript usage across multiple conditions with replicates
 - Cluster events and transcripts according to PSI values across conditions
 
 ![Slide1.jpg](https://bitbucket.org/repo/4gEBMd/images/3120745382-Slide1.jpg)
@@ -18,7 +17,7 @@ The tool has various modular operations that can be run separately to:
 
 ![figure2_for_readme_bitbucket.jpg](https://bitbucket.org/repo/4gEBMd/images/612499447-figure2_for_readme_bitbucket.jpg)
 
-**Fig 2.** (a) SUPPA calculates the magnitude of splicing change (ΔPSI) (for events or transcripts) and its significance across multiple biological conditions, using two or more replicates per condition. Conditions are analyzed in a sequential order specified as input. (b) Statistical significance is calculated by comparing the observed ΔPSI between conditions with the distribution of the ΔPSI between replicates as a function of the expression of the transcripts defining the events (for events) or as a functon of the gene expression (for transcripts). When there is a large (>10) number of replicates per condition, you can also run SUPPA with a classical statistical test (Wilcoxon) per event or per transcsript (not shown in the figure). (c) Using the output from the differential splicing analysis, SUPPA can cluster events or transcripts with similar splicing patterns across conditions using a density-based clustering algorithm.
+**Fig 2.** (a) SUPPA calculates the magnitude of splicing change (ΔPSI) (for events or transcripts) and its significance across multiple biological conditions, using two or more replicates per condition. Conditions are analyzed in a sequential order specified as input. (b) Statistical significance is calculated by comparing the observed ΔPSI between conditions with the distribution of the ΔPSI between replicates as a function of the expression of the transcripts defining the events (for events) or as a functon of the gene expression (for transcripts). When there is a large (>10) number of replicates per condition, you can also run SUPPA with a classical statistical test (Wilcoxon) per local event or per transcsript (not shown in the figure). (c) Using the output from the differential splicing analysis, SUPPA can cluster events or transcripts with similar splicing patterns across conditions using a density-based clustering algorithm.
  
 We provide below detailed information on how to install and run SUPPA. Please join the SUPPA google-group for sharing your thoughts and questions (suppa-users@googlegroups.com). 
 
@@ -75,7 +74,7 @@ where the subcommand can be one of these five:
 - **clusterEvents**     : Cluster events according to PSI values across conditions.
 
 ----------------------------
-**Event generation**
+**Generation of transcript events and local alternative splicing events**
 ==============
 ----------------------------
 
@@ -448,7 +447,7 @@ The output will look like an expression file with multiple files as described ab
 
 
 -------------------
-**Differential splicing analysis**
+**Differential splicing analysis for transcripts and local events**
 ==============
 -------------------
 
