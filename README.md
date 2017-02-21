@@ -63,7 +63,7 @@ SUPPA is ready to use. Once downloaded, it can be used directly from the command
 SUPPA works with a command/subcommand structure:
 
 ```
-suppa.py subcommand options
+python3.4 suppa.py subcommand options
 ```
 where the subcommand can be one of these five:
 
@@ -128,7 +128,7 @@ The *generateEvents* operation uses the lines where the feature (column 3) is "e
 To generate the events from the GTF file one has to run the following command:
 
 ```
-suppa.py generateEvents [options]
+python3.4 suppa.py generateEvents [options]
 ```
 List of options available:
 
@@ -165,13 +165,13 @@ List of options available:
 The command line to generate local AS events will be of the form:
 
 ```
-suppa.py generateEvents -i <input-file.gtf> -o <output-file> -f ioe -e <list-of-events>
+python3.4 suppa.py generateEvents -i <input-file.gtf> -o <output-file> -f ioe -e <list-of-events>
 ```
 
 The command to generate the transcript "events" would be of the form:
 
 ```
-suppa.py generateEvents -i <input-file.gtf> -o <output-file> -f ioi 
+python3.4 suppa.py generateEvents -i <input-file.gtf> -o <output-file> -f ioi 
 ```
 
 ### **Output files** ###
@@ -339,7 +339,7 @@ transcript3	<expression>	<expression>	<expression>	<expression>
 At the moment the PSI per transcript isoform is calculated in the following way:
 
 ```
-suppa.py psiPerIsoform [options]
+python3.4 suppa.py psiPerIsoform [options]
 ```
 List of options available:
 
@@ -356,7 +356,7 @@ List of options available:
 An example of the usage of the program is:
 
 ```
-suppa.py psiPerIsoform -g <gtf-file> -e <expression-file> -o <output-file>
+python3.4 suppa.py psiPerIsoform -g <gtf-file> -e <expression-file> -o <output-file>
 ```
 
 
@@ -365,7 +365,7 @@ suppa.py psiPerIsoform -g <gtf-file> -e <expression-file> -o <output-file>
 To calculate the PSI value for each event from the *ioe* and the *transcript expression file* one has to run the following command:
 
 ```
-suppa.py psiPerEvent [options]
+python3.4 suppa.py psiPerEvent [options]
 ```
 List of options available:
 
@@ -384,7 +384,7 @@ List of options available:
 An example of the usage of the program is:
 
 ```
-suppa.py psiPerEvent --ioe-file <ioe-file> --expression-file <expression-file> -o <output-file> 
+python3.4 suppa.py psiPerEvent --ioe-file <ioe-file> --expression-file <expression-file> -o <output-file> 
 ```
 
 ### **Output files** ###
@@ -420,7 +420,7 @@ ENSG00000000419.12;SE:chr20:50940933-50941105:50941209-50942031:-       0.023022
 Transcript expression files used with SUPPA typically come from calculations with multiple samples. To facilitate the generation of a single file with all the transcript expression values for all samples, SUPPA distribution includes a program to combine multiple simple transcript expression files into one single file:
 
 ```
-suppa.py joinFiles [options]
+python3.4 suppa.py joinFiles [options]
 ```
 
 
@@ -438,7 +438,7 @@ where the options are:
 We show below an example of the usage of the program for reading multiple output files from Sailfish to join together the 3rd column, given that all files have in the first column the transcript ids (which are kept for the output):
 
 ```
-suppa.py joinFiles -f tpm -i sample1.tpm sample2.tpm sample3.tpm -o all_samples_tpms  
+python3.4 suppa.py joinFiles -f tpm -i sample1.tpm sample2.tpm sample3.tpm -o all_samples_tpms  
 ```
 
 The output will look like an expression file with multiple files as described above.
@@ -486,7 +486,7 @@ where the expression values are given in TPM units.
 ### **Command and options** ###
 To calculate the dpsi from the *ioe*, *psi* and the *expression file* one has to run the following command:
 ```
-suppa.py diffSplice [options]
+python3.4 suppa.py diffSplice [options]
 ```
 
 List of options available:
@@ -519,7 +519,7 @@ List of options available:
 An example of the usage of the program with transcripts is:
 
 ```
-suppa.py diffSplice --method <empirical> --input <ioi-file> --psi <Cond1.psi> <Cond2.psi> --expression-file <Cond1_expression-file> <Cond2_expression-file> --area <1000> --lower-bound <0.05> -gc -o <output-file>
+python3.4 suppa.py diffSplice --method <empirical> --input <ioi-file> --psi <Cond1.psi> <Cond2.psi> --expression-file <Cond1_expression-file> <Cond2_expression-file> --area <1000> --lower-bound <0.05> -gc -o <output-file>
 ```
 
 ### **Differential splicing with local events** ###
@@ -527,7 +527,7 @@ suppa.py diffSplice --method <empirical> --input <ioi-file> --psi <Cond1.psi> <C
 An example of the usage of the program with local events is:
 
 ```
-suppa.py diffSplice --method <empirical> --input <ioe-file> --psi <Cond1.psi> <Cond2.psi> --expression-file <Cond1_expression-file> <Cond2_expression-file> --area <1000> --lower-bound <0.05> -gc -o <output-file>
+python3.4 suppa.py diffSplice --method <empirical> --input <ioe-file> --psi <Cond1.psi> <Cond2.psi> --expression-file <Cond1_expression-file> <Cond2_expression-file> --area <1000> --lower-bound <0.05> -gc -o <output-file>
 ```
 
 
@@ -619,7 +619,7 @@ event3		<psi_value>	<psi_value>	<psi_value>	<psi_value>	<psi_value>	<psi_value>
 SUPPA will use the psivec file to cluster events according to the PSI values across samples using those events that show significant change in at least one pairwise comparison using the dpsi file. To perform the clustering from the *dpsi* and the *psivec* one has to run the following command:
 
 ```
-suppa.py clusterEvents [options]
+python3.4 suppa.py clusterEvents [options]
 ```
 List of options available:
 
@@ -644,7 +644,7 @@ List of options available:
 An example of the usage of the program is:
 
 ```
-suppa.py clusterEvents --dpsi <dpsi-file> --psivec <psivec-file> --sig-threshold <0.05> --eps <0.05> --min-pts <20> --groups <1-3,4-6> -o <output-file> 
+python3.4 suppa.py clusterEvents --dpsi <dpsi-file> --psivec <psivec-file> --sig-threshold <0.05> --eps <0.05> --min-pts <20> --groups <1-3,4-6> -o <output-file> 
 
 ```
 
