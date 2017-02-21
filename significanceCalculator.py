@@ -32,8 +32,7 @@ parser.add_argument('-p', '--psi',
                     action="store",
                     nargs="+",
                     help="Path of the PSI files. PSI files and the transcript expression (TPM) files "
-                         "must have the same order."
-                         "The conditions files and the tpm files must have the same order.")
+                         "must have the same order.")
 
 parser.add_argument('-e', '--tpm',
                     dest="tpms",
