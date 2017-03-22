@@ -243,13 +243,6 @@ def calculate_empirical_pvalue(local_area, dpsi_abs_value):
         return event_pvalue
 
 
-
-        # It is divided by 2 because we are using abs(deltaPSI) values and therefore it is a one-tailed test
-        event_pvalue = (1.0 - ecdf(dpsi_abs_value)) * 0.5
-
-        return event_pvalue
-
-
 def calculate_between_conditions_distribution(cond1, cond2, tpm1, tpm2, ioe):
 
         cond1_psi_values = create_dict(cond1)
