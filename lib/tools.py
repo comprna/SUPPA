@@ -117,7 +117,7 @@ class IoeParser(Parser):
         self.GENE_ID_INDEX = 1
         self.EVENT_ID_INDEX = 2
         self.ALT_ISO_INDEX = 3
-        self.TOTAL_ISO_INDEX =4   
+        self.TOTAL_ISO_INDEX = 4
         
     def parseLine(self, line, lineNumber):
         try:
@@ -456,3 +456,17 @@ class PsiWriter(Writer, PsiParser):
         for x in colIds:
             line.append(str(value[x]))
         return line
+
+
+def ioi_writer(genome_obj, output_file):
+
+    with open(output_file+".ioi", "w+") as fh:
+        fh.write("seqname\tgene_id\tisoform_id\tinclusion_transcripts\ttotal_transcripts\n")
+        for obj in genome_obj:
+            for trans_id in obj[0].transcripts.keys():
+                chrm = obj[1]
+                gene_id = obj[0].name
+                all_trans_ids = ",".join(obj[0].sortedTranscripts)
+                line = "%s\t%s\t%s\t%s\t%s\n" % \
+                       (chrm, gene_id, gene_id+";"+trans_id, trans_id, all_trans_ids)
+                fh.write(line)

@@ -32,27 +32,23 @@ parser.add_argument('-p', '--psi',
                     action="store",
                     nargs="+",
                     help="Path of the PSI files. PSI files and the transcript expression (TPM) files "
-                         "must have the same order.")
+                         "must have the same order."
+                         "The conditions files and the tpm files must have the same order.")
 
 parser.add_argument('-e', '--tpm',
                     dest="tpms",
                     action="store",
                     nargs="+",
-                    help="Path of the transcript expression (TPM) files." 
-                         "The PSI files and the expression (TPM) files must have the same order.")
+                    help="Path of the transcript expression (TPM) files. Conditions files and the transcript expression "
+                         "(TPM) files must have the same order."
+                         "The conditions files and the tpm files must have the same order.")
 
 parser.add_argument('-i', '--input',
                     dest="iox",
                     action="store",
                     nargs=1,
                     default=None,
-                    help="Input file with the (local or transcript) events (.ioe or .ioi format)")
-
-parser.add_argument('-o', '--output',
-                    dest="output",
-                    action="store",
-                    default=None,
-                    help="Name of the output files.")
+                    help="Input file with the event-transcripts equivalence (.ioe or .ioi format)")
 
 parser.add_argument('-a', '--area',
                     dest="area",
@@ -80,7 +76,7 @@ parser.add_argument('-gc', '--gene-correction',
                     dest="gene_cor",
                     action="store_true",
                     default=False,
-                    help="Boolean. If TRUE, SUPPA correct the p-values by gene. (Default: False).")
+                    help="Boolean. If True, SUPPA correct the p-values by gene. (Default: False).")
 
 parser.add_argument('-al', '--alpha',
                     dest="alpha",
@@ -89,6 +85,12 @@ parser.add_argument('-al', '--alpha',
                     type=float,
                     default=[0.05],
                     help="Family-wise error rate to use for the multiple test correction. (Default: 0.05).")
+
+parser.add_argument('-o', '--output',
+                    dest="output",
+                    action="store",
+                    default=None,
+                    help="Name of the output files.")
 
 parser.add_argument("-mo", "--mode", default="INFO",
                     help="to choose from DEBUG, INFO, WARNING, ERROR and CRITICAL")

@@ -159,7 +159,6 @@ class Gene():
             new_gene.sortedTranscripts = self.sortedTranscripts[idxs[i-1]:idxs[i]]
             new_gene.transcripts = {xtranscript: self.transcripts[xtranscript]
                                     for xtranscript in new_gene.sortedTranscripts}
-
             new_genes.append(new_gene)
         return new_genes
 
@@ -228,19 +227,5 @@ def gtf_reader(parse_file, logger):
             l_count += 1
             results = parse_gtf_line(line, l_count, logger)
             if results:
-                # results
                 all_results.append(results)
     return all_results
-
-
-def ioi_writer(genome_obj, output_file):
-
-    with open(output_file+".ioi", "w+") as fh:
-        for obj in genome_obj:
-            for trans_id in obj[0].transcripts.keys():
-                chrm = obj[1]
-                gene_id = obj[0].name
-                all_trans_ids = ",".join(obj[0].sortedTranscripts)
-                line = "%s\t%s\t%s\t%s\t%s\n" % \
-                       (chrm, gene_id, gene_id+";"+trans_id, trans_id, all_trans_ids)
-                fh.write(line)

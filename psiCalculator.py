@@ -25,7 +25,7 @@ parser.add_argument("-e", "--expression-file", required=True,
 parser.add_argument("-o", "--output-file", required=True,
                     help="Output psi file.")
 parser.add_argument("-f", "--total-filter", type=float, default=0,
-                    help="Minimum total expression of the transcripts involved in the event (Default = 0).")
+                    help="Minimum total expression of the transcripts involved in the event.")
 parser.add_argument("-m", "--mode", default="INFO",
                     help="to choose from DEBUG, INFO, WARNING, ERROR and CRITICAL")
 
@@ -51,8 +51,6 @@ def main():
     psi_dictionary = {}  # to store the psi values calculated [event_id] = {[colId] = expression}
     col_ids = []  # to store all the column_id for the expression fields
     try:
-
-            
         #Buffering EXPRESSION FILE
         factory = FactoryReader()
         r = factory.getReader("expression")

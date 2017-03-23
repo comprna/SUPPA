@@ -237,14 +237,14 @@ def slice_list(lst, index, slice_len):
 
 def calculate_empirical_pvalue(local_area, dpsi_abs_value):
 
-        #Get the absolute values from the local_area (replicates distribution)
-        abs_local_area = [abs(val) for val in local_area]
-        ecdf = ECDF(abs_local_area)
-        # ecdf = ECDF(local_area)
-        # It is divided by 2 because we are using abs(deltaPSI) values and therefore it is a one-tailed test
-        event_pvalue = (1.0 - ecdf(dpsi_abs_value)) * 0.5
+    abs_local_area = [abs(val) for val in local_area]
 
-        return event_pvalue
+    ecdf = ECDF(abs_local_area)
+
+    # It is divided by 2 because we are using abs(deltaPSI) values and therefore it is a one-tailed test
+    event_pvalue = (1.0 - ecdf(dpsi_abs_value)) * 0.5
+
+    return event_pvalue
 
 
 def calculate_between_conditions_distribution(cond1, cond2, tpm1, tpm2, ioe):
