@@ -2,7 +2,7 @@
 """
 Created on Wed Aug 06 17:51:05 2014
 
-@author: Gael P Alamancos
+@author: Gael P Alamancs
 @email: gael.perez[at]upf.edu
 """
 
