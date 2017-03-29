@@ -1,3 +1,6 @@
+Here we provide an extensive explanation about how SUPPA works and all the running options.
+In the wiki we have a short tutorial on an example dataset.
+
 ----------------------------
 **OVERVIEW**
 ==========
