@@ -2,8 +2,9 @@
 """
 Created on Wed May 25 04:20:00 CEST 2016
 
-@authors: Juan C Entizne
-@email: juancarlos.entizne01[at]estudiant.upf.edu
+@authors: Juan C Entizne, Juan L. Trincado
+@email: juancarlos.entizne01[at]estudiant.upf.edu,
+        juanluis.trincado[at]upf.edu
 """
 
 import os
@@ -56,6 +57,12 @@ parser.add_argument('-e', '--eps',
                     help="Maximum (Euclidean) distance (between 0 and 1) to consider two events as members of "
                          "the same cluster. (Default: 0.05).")
 
+parser.add_argument('-s', '--separation',
+                    action="store",
+                    type=float,
+                    default=0,
+                    help="Minimum separation for considering two points in different clusters. (Default: 0).")
+
 parser.add_argument('-n', '--min-pts',
                     dest="minpts",
                     action="store",
@@ -69,7 +76,11 @@ parser.add_argument("-m", "--metric", dest="metric", choices=["euclidean", "manh
                                                                               "\teuclidean (Default),\n"
                                                                               "\tmanhattan,\n"
                                                                               "\tcosine.\n")
-
+parser.add_argument("-c", "--clustering", choices=["OPTICS", "DBSCAN"],
+                    default="DBSCAN", help="Clustering method to use."
+                                                                              "Options:\n"
+                                                                              "\tOPTICS ,\n"
+                                                                              "\tDBSCAN (Default).\n")
 parser.add_argument('-g', '--groups',
                     dest="indexes",
                     action="store",
@@ -107,8 +118,8 @@ def main():
     dpsi_file = create_path(args.dpsi)
     psivec_file = create_path(args.psivec)
 
-    cluster_analysis(dpsi_file[0], psivec_file[0], args.sig_threshold, args.dpsi_threshold, args.eps, args.minpts, args.metric,
-                     args.indexes[0], args.output)
+    cluster_analysis(dpsi_file[0], psivec_file[0], args.sig_threshold, args.dpsi_threshold, args.eps, args.minpts,
+                     args.metric,args.indexes[0], args.clustering, args.separation, args.output)
 
 if __name__ == "__main__":
     main()
