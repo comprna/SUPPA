@@ -243,7 +243,7 @@ def calculate_empirical_pvalue(local_area, dpsi_abs_value):
         return event_pvalue
 
 
-def calculate_between_conditions_distribution(cond1, cond2, tpm1, tpm2, ioe):
+def calculate_between_conditions_distribution(cond1, cond2, tpm1, tpm2, ioe, save_tpm, output):
 
         cond1_psi_values = create_dict(cond1)
         cond2_psi_values = create_dict(cond2)
@@ -258,6 +258,19 @@ def calculate_between_conditions_distribution(cond1, cond2, tpm1, tpm2, ioe):
         tpm_values = get_tpm_values(tpm1_values, tpm2_values, transcripts_values)
 
         between_conditions_avglogtpm = calculate_transcript_abundance(tpm_values)
+
+        if(save_tpm==True):
+            #Save between_conditions_avglogtpm object
+            print("Saving between_conditions_avglogtpm...")
+            output = output + "_avglogtpm.tab"
+            outFile = open(output, 'w')
+            for key in between_conditions_avglogtpm.keys():
+                line = key + "\t" + str(between_conditions_avglogtpm[key]) + "\n"
+                outFile.write(line)
+            outFile.close()
+
+            print("Saved "+output)
+
         between_conditions_absdpsi_logtpm = merge_dict(dpsi_abs_values, between_conditions_avglogtpm)
 
         return between_conditions_absdpsi_logtpm, psi_values, tpm_values, dpsi_abs_values, dpsi_values, discarded_events
@@ -465,10 +478,10 @@ def write_psivec_file(psi_lst, output):
             merged_psi_results.to_csv(fh, sep="\t", na_rep="nan", header=False)
 
 
-def empirical_test(cond1, tpm1, cond2, tpm2, ioe, area, cutoff):
+def empirical_test(cond1, tpm1, cond2, tpm2, ioe, area, cutoff, save_tpm, output):
 
     between_conditions_distribution, psi_dict, tpm_dict, abs_dpsi_dict, dpsi_vals, discarded_dt \
-        = calculate_between_conditions_distribution(cond1, cond2, tpm1, tpm2, ioe)
+        = calculate_between_conditions_distribution(cond1, cond2, tpm1, tpm2, ioe, save_tpm, output)
 
     replicates_distribution = create_replicates_distribution(between_conditions_distribution, psi_dict, tpm_dict)
 
@@ -577,7 +590,7 @@ def convert_to_log10pval(dpsi_pval_values, sig_threshold=0.05, dpsi_threshold=0.
     return log10_pvalues, events_significance
 
 
-def multiple_conditions_analysis(method, psi_lst, tpm_lst, ioe, area, cutoff, paired, gene_cor, alpha, output):
+def multiple_conditions_analysis(method, psi_lst, tpm_lst, ioe, area, cutoff, paired, gene_cor, alpha, save_tpm, output):
 
     # Setting logging preferences
     logger = logging.getLogger(__name__)
@@ -597,7 +610,7 @@ def multiple_conditions_analysis(method, psi_lst, tpm_lst, ioe, area, cutoff, pa
 
         if method == 'empirical':
             event_lst, uncorrected_pvals, dpsi_vals, discarded_dt = empirical_test(cond1, tpm1, cond2, tpm2,
-                                                                                  ioe, area, cutoff)
+                                                                                  ioe, area, cutoff, save_tpm, output)
             corrected_pvals_dict = {k: v for k, v in zip(event_lst, uncorrected_pvals)}
 
         elif method == 'classical':
