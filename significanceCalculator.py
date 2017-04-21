@@ -86,6 +86,10 @@ parser.add_argument('-al', '--alpha',
                     default=[0.05],
                     help="Family-wise error rate to use for the multiple test correction. (Default: 0.05).")
 
+parser.add_argument('-s', '--save_tpm_events',
+                    action="store_true",
+                    default=False,
+                    help="Boolean. If True, the average log TPM of the events will be saved in an external file (Default: False).")
 
 parser.add_argument('-o', '--output',
                     dest="output",
@@ -117,7 +121,9 @@ def main():
     ioe_fl = create_path(args.ioe)
 
     multiple_conditions_analysis(args.method, cond_files, expr_files, ioe_fl[0], args.area[0],
-                                 args.lower_bound[0], args.paired, args.gene_cor, args.alpha[0], args.output)
+                                 args.lower_bound[0], args.paired, args.gene_cor, args.alpha[0],
+                                 args.save_tpm_events, args.output)
+
 
 if __name__ == "__main__":
     main()
