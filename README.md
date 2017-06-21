@@ -490,7 +490,7 @@ Using the PSI values in all samples, and the information of which events change 
 
 ### **Input files** ###
 
-An **dpsi** file and **psivec** file are required (see definitions above). The dpsi file contains the information about which events are signficantly differentially spliced in each pairwise comparison. For instance, a dpsi file with data from the comparison of three conditions will look like:
+A **dpsi** file and **psivec** file are required (see definitions above). The dpsi file contains the information about which events are signficantly differentially spliced in each pairwise comparison. For instance, a dpsi file with data from the comparison of three conditions will look like:
 ```
 Cond1_Cond2_dPSI	Cond1_Cond2_p-val	Cond2_Cond3_dPSI	Cond2_Cond3_p-val
 event1		<dpsi_value>		<dpsi_value>		<dpsi_value>		<dpsi_value>
@@ -510,7 +510,7 @@ event3		<psi_value>	<psi_value>	<psi_value>	<psi_value>	<psi_value>	<psi_value>
 
 ### **Command and options** ###
 
-SUPPA will use the psivec file to cluster events according to the PSI values across samples using those events that show significant change in at least one pairwise comparison using the dpsi file. To perform the clustering from the *dpsi* and the *psivec* one has to run the following command:
+SUPPA will use the psivec file to cluster events according to the PSI values across samples using those events that show significant change in at least one pairwise comparison using the dpsi file. Two methods are available: DBSCAN and OPTICS. Both methods require as input the minimum number of events in a cluster. OPTICS also requires as the maximum reachability distance (s), which represents the maximum distance in PSI space of an event to a cluster  To perform the clustering from the *dpsi* and the *psivec* one has to run the following command:
 
 ```
 suppa.py clusterEvents [options]
@@ -521,9 +521,13 @@ List of options available:
 
 - **-p** | **--psivec**: Input .psivec file generated from SUPPA diffSplice operation.
 
-- **-s** | **--sig-threshold**: p-value threshold to consider an event significant from the dpsi file.
+- **-st** | **--sig-threshold**: p-value threshold to consider an event significant from the dpsi file.
+
+- **-dt** | **--dpsi-threshold**: Lower-bound for the absolute delta PSI value to cluster. (Default: 0.05)
 
 - **-e** | **--eps**: Maximum (Euclidean) distance (between 0 and 1) to consider two events as members of the same cluster. (Default: 0.05).
+
+- **-s** | **--separation**: maximum distance in PSI space of an event to a cluster. Required for OPTICS method
 
 - **-n** | **--min-pts**: Minimum number of events required per cluster. (Default: 20).
 
@@ -531,7 +535,9 @@ List of options available:
                         Column numbers have to be continuous, with no
                         overlapping or missing columns between them. Ex:1-3,4-6
 
-- **-o** | **--output-file**: Name of the output file
+- **-c** | **--clustering**: Clustering method to use (DBSCAN, OPTICS). (Default: DBSCAN)
+
+- **-o** | **--output**: Name of the output file
 
 - **-h**  | **--help**: display the help message describing the different parameters
 
@@ -546,7 +552,7 @@ suppa.py clusterEvents --dpsi <dpsi-file> --psivec <psivec-file> --sig-threshold
 
 ### **Output files** ###
 
-SUPPA cluterEvents operation generates a *clustvec* file per each pair of dpsi and psivec files. 
+SUPPA clusterEvents operation generates a *clustvec* file per each pair of dpsi and psivec files. 
 
 
 **clustvec**
