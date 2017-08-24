@@ -145,17 +145,16 @@ def main():
                             try:
                                 psi_dictionary[arguments["event_id"]][x] = (
                                     alternative_transcripts[x]/total_transcripts[x])
-                                #Here can we introduce the calculation of the mean of the total transcripts for each event
-                                expression_dictionary_events[arguments["event_id"]][x] = np.mean(total_transcripts[x])
+                                expression_dictionary_events[arguments["event_id"]][x] = total_transcripts[x]
                             except ZeroDivisionError:
                                 logger.debug("Zero division for event %s.(psi= -1)." % arguments["event_id"])
                                 psi_dictionary[arguments["event_id"]][x] = -1
-                                expression_dictionary_events[arguments["event_id"]][x] = np.mean(total_transcripts[x])
+                                expression_dictionary_events[arguments["event_id"]][x] = total_transcripts[x]
                         #If it passes the filter but skip == True
                         elif not skip:   
                             #for x in col_ids:
                             psi_dictionary[arguments["event_id"]][x] = -1
-                            expression_dictionary_events[arguments["event_id"]][x] = np.mean(total_transcripts[x])
+                            expression_dictionary_events[arguments["event_id"]][x] = total_transcripts[x]
 
             except StopIteration:
                 writer = Writer.getWriter("PSI")
@@ -176,8 +175,8 @@ def main():
                     writer.writeLine("\t".join(col_ids), False)
                     for key, value in sorted(expression_dictionary_events.items()):
                         logger.debug("Calculating tpm for %s" % key)
-                        psi_line = PsiWriter.lineGenerator(key, value, col_ids)
-                        writer.writeLine("\t".join(psi_line))
+                        tpm_line = TpmWriter.lineGenerator(key, value, col_ids)
+                        writer.writeLine("\t".join(tpm_line))
                     writer.closeFile()
 
     except BaseException:
