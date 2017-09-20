@@ -91,6 +91,26 @@ parser.add_argument('-s', '--save_tpm_events',
                     default=False,
                     help="Boolean. If True, the average log TPM of the events will be saved in an external file (Default: False).")
 
+parser.add_argument('-c', '--combination',
+                    action="store_true",
+                    dest="seq",
+                    default=False,
+                    help="Boolean. If True, SUPPA perform the analysis between all the possible combinations of conditions (Default: False).")
+
+parser.add_argument('-me', '--median',
+                    dest="median",
+                    action="store_true",
+                    default=False,
+                    help="Boolean. If True, SUPPA use the median to calculate the Delta PSI. (Default: False).")
+
+parser.add_argument('-th', '--tpm-threshold',
+                    dest="tpm_th",
+                    action="store",
+                    nargs=1,
+                    type=float,
+                    default=[1.0],
+                    help="Minimum transcript average TPM value within-replicates and between-conditions to be included in the analysis. (Default: 1.0).")
+
 parser.add_argument('-o', '--output',
                     dest="output",
                     action="store",
@@ -122,7 +142,8 @@ def main():
 
     multiple_conditions_analysis(args.method, cond_files, expr_files, ioe_fl[0], args.area[0],
                                  args.lower_bound[0], args.paired, args.gene_cor, args.alpha[0],
-                                 args.save_tpm_events, args.output)
+                                 args.save_tpm_events, args.seq, args.median, args.tpm_th[0],
+                                 args.output)
 
 
 if __name__ == "__main__":
