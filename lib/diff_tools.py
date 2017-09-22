@@ -137,8 +137,6 @@ def get_tpm_values(tpm1_values, tpm2_values, transcripts_values):
 
 def calculate_transcript_abundance(tpm_values, tpm_th):
 
-    # TODO TPM filter, check what happens if tpm_val = 1
-    # tpm_th = 10.0
     tpm_th_log10 = math.log10(tpm_th)
 
     temp_between_conditions_logtpm = defaultdict(list)
@@ -154,7 +152,6 @@ def calculate_transcript_abundance(tpm_values, tpm_th):
                 replicates_logtpms = [math.log10(sum(rep_tpms)) for rep_tpms in replicates_transcript_values]
                 average_replicate_transcript_abundance = sum(replicates_logtpms)/len(replicates_logtpms)
 
-                #TODO TPM filter (in testing)
                 if average_replicate_transcript_abundance >= tpm_th_log10:
                     conditions_average_logtpm.append(average_replicate_transcript_abundance)
 
@@ -165,7 +162,6 @@ def calculate_transcript_abundance(tpm_values, tpm_th):
         if len(conditions_average_logtpm) == 2.0:
             between_conditions_average_transcript_abundance = 0.5 * sum(conditions_average_logtpm)
 
-            # TODO TPM filter (in testing)
             if between_conditions_average_transcript_abundance >= tpm_th_log10:
                 temp_between_conditions_logtpm[event].append(between_conditions_average_transcript_abundance)
         else:
