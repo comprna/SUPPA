@@ -108,7 +108,8 @@ try:
     #Writing the header in the output file
     f.write("\t".join(outputHeader) + "\n")
     #Looping through all the unique IDs avoiding the "header" .
-    for key, value in [(x,y) for x, y in dictionary.iteritems() if x != "header"]:
+    for key, value in [(x,y) for x, y in dictionary.items() if x != "header"]:
+
         line = []
         line.append(key)    #Adding the common id
         for inputFile in filesList:
