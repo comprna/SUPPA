@@ -147,13 +147,13 @@ def main():
                                     alternative_transcripts[x]/total_transcripts[x])
                                 expression_dictionary_events[arguments["event_id"]][x] = total_transcripts[x]
                             except ZeroDivisionError:
-                                logger.debug("Zero division for event %s.(psi= -1)." % arguments["event_id"])
-                                psi_dictionary[arguments["event_id"]][x] = -1
+                                logger.debug("Zero division for event %s.(psi= nan)." % arguments["event_id"])
+                                psi_dictionary[arguments["event_id"]][x] = np.nan
                                 expression_dictionary_events[arguments["event_id"]][x] = total_transcripts[x]
                         #If it passes the filter but skip == True
                         elif not skip:   
                             #for x in col_ids:
-                            psi_dictionary[arguments["event_id"]][x] = -1
+                            psi_dictionary[arguments["event_id"]][x] = np.nan
                             expression_dictionary_events[arguments["event_id"]][x] = total_transcripts[x]
 
             except StopIteration:
