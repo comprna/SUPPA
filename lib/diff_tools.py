@@ -4,11 +4,14 @@ Created on Wed May 25 04:20:00 CEST 2016
 
 @authors: Juan C Entizne
 @email: juancarlos.entizne01[at]estudiant.upf.edu
+
+Modified by Juan L. Trincado
+@email: juanluis.trincado[at].upf.edu
+
 """
 
 import os
 import sys
-import time
 import math
 import logging
 import numpy as np
@@ -69,32 +72,49 @@ def get_psi_values(dict1, dict2):
 
     return psi_values
 
+def get_proportion_nans(psi_list):
 
-def calculate_delta_psi(psi_values, median):
+    count = 0
+    for x in psi_list:
+        if(math.isnan(x)):
+            count += 1
+    size = len(psi_list)
+    return float(count)/float(size)
+
+
+def calculate_delta_psi(psi_values, median, nan_th):
 
     abs_dt, dt, discarded_events = (defaultdict(list) for _ in range(3))
     for event in psi_values:
 
-        # Strict form to calculate deltaPSI: event excluded if -1.0 in either condition
-        if -1.0 in psi_values[event][0] or -1.0 in psi_values[event][1]:
+        #Get the proportion of missing values in an event
+        prop0 = get_proportion_nans(psi_values[event][0])
+        prop1 = get_proportion_nans(psi_values[event][1])
+
+        # event will be excluded if any of the proportions overtake the nan_threshold
+        if nan_th < prop0 or nan_th < prop1:
             discarded_events[event].append([float("nan"), 1.0000000000])
 
         else:
 
+            #if passes the threshold, remove all the nan values form each list
+            psi_values_0 = [x for x in psi_values[event][0] if str(x) != 'nan']
+            psi_values_1 = [x for x in psi_values[event][1] if str(x) != 'nan']
+
             if median:
 
-                abs_dpsi_val = abs(np.nanmedian(psi_values[event][1]) - np.nanmedian(psi_values[event][0]))
+                abs_dpsi_val = abs(np.nanmedian(psi_values_1) - np.nanmedian(psi_values_0))
                 abs_dt[event].append(abs_dpsi_val)
 
-                dpsi_val = np.nanmedian(psi_values[event][1]) - np.nanmedian(psi_values[event][0])
+                dpsi_val = np.nanmedian(psi_values_1) - np.nanmedian(psi_values_0)
                 dt[event].append(dpsi_val)
 
             else:
 
-                abs_dpsi_val = abs(np.nanmean(psi_values[event][1]) - np.nanmean(psi_values[event][0]))
+                abs_dpsi_val = abs(np.nanmean(psi_values_1) - np.nanmean(psi_values_0))
                 abs_dt[event].append(abs_dpsi_val)
 
-                dpsi_val = np.nanmean(psi_values[event][1]) - np.nanmean(psi_values[event][0])
+                dpsi_val = np.nanmean(psi_values_1) - np.nanmean(psi_values_0)
                 dt[event].append(dpsi_val)
 
     # Flatten the list of list of the dictionary values
@@ -137,7 +157,10 @@ def get_tpm_values(tpm1_values, tpm2_values, transcripts_values):
 
 def calculate_transcript_abundance(tpm_values, tpm_th):
 
-    tpm_th_log10 = math.log10(tpm_th)
+    if(tpm_th!=0):
+        tpm_th_log10 = math.log10(tpm_th)
+    else:
+        tpm_th_log10 = -float('Inf')
 
     temp_between_conditions_logtpm = defaultdict(list)
     for event in tpm_values:
@@ -247,13 +270,13 @@ def calculate_empirical_pvalue(local_area, dpsi_abs_value):
         return event_pvalue
 
 
-def calculate_between_conditions_distribution(cond1, cond2, tpm1, tpm2, ioe, save_tpm, median, tpm_th, output):
+def calculate_between_conditions_distribution(cond1, cond2, tpm1, tpm2, ioe, save_tpm, median, tpm_th, nan_th, output):
 
         cond1_psi_values = create_dict(cond1)
         cond2_psi_values = create_dict(cond2)
         psi_values = get_psi_values(cond1_psi_values, cond2_psi_values)
 
-        dpsi_abs_values, dpsi_values, discarded_events = calculate_delta_psi(psi_values, median)
+        dpsi_abs_values, dpsi_values, discarded_events = calculate_delta_psi(psi_values, median, nan_th)
 
         transcripts_values = get_events_transcripts(ioe)
 
@@ -482,10 +505,10 @@ def write_psivec_file(psi_lst, output):
             merged_psi_results.to_csv(fh, sep="\t", na_rep="nan", header=False)
 
 
-def empirical_test(cond1, tpm1, cond2, tpm2, ioe, area, cutoff, save_tpm, median, tpm_th, output):
+def empirical_test(cond1, tpm1, cond2, tpm2, ioe, area, cutoff, save_tpm, median, tpm_th, nan_th, output):
 
     between_conditions_distribution, psi_dict, tpm_dict, abs_dpsi_dict, dpsi_vals, discarded_dt \
-        = calculate_between_conditions_distribution(cond1, cond2, tpm1, tpm2, ioe, save_tpm, median, tpm_th, output)
+        = calculate_between_conditions_distribution(cond1, cond2, tpm1, tpm2, ioe, save_tpm, median, tpm_th, nan_th, output)
 
     replicates_distribution = create_replicates_distribution(between_conditions_distribution, psi_dict, tpm_dict)
 
@@ -595,7 +618,7 @@ def convert_to_log10pval(dpsi_pval_values, sig_threshold=0.05, dpsi_threshold=0.
 
 
 def multiple_conditions_analysis(method, psi_lst, tpm_lst, ioe, area, cutoff, paired, gene_cor, alpha,
-                                 save_tpm, comb, median, tpm_th, output):
+                                 save_tpm, comb, median, tpm_th, nan_th, output):
 
     # Setting logging preferences
     logger = logging.getLogger(__name__)
@@ -620,7 +643,7 @@ def multiple_conditions_analysis(method, psi_lst, tpm_lst, ioe, area, cutoff, pa
         if method == 'empirical':
             event_lst, uncorrected_pvals, dpsi_vals, discarded_dt = empirical_test(cond1, tpm1, cond2, tpm2, ioe, area,
                                                                                    cutoff, save_tpm, median, tpm_th,
-                                                                                   output)
+                                                                                   nan_th, output)
             corrected_pvals_dict = {k: v for k, v in zip(event_lst, uncorrected_pvals)}
 
         elif method == 'classical':
