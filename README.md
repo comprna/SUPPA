@@ -307,7 +307,7 @@ List of options available:
 
 - **-i** | **--ioe-file**: input file with the definition of the events and corresponding transcripts
 
-- **-f** | **--total-filter**: Minimum total expression of the transcripts involved in the event. If used, it will filter out the events that do not reach this total expression value for the transcripts defining the event (the denominator of the PSI calculation) (default = no-filter is applied).
+- **-f** | **--total-filter**: Minimum total expression of the transcripts involved in the event. If used, it will filter out the events that do not reach this total expression value for the transcripts defining the event (the denominator of the PSI calculation) (default = no filter is applied).
 
 - **-o** | **--output-file**: output file name
 
