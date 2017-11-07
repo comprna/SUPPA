@@ -65,26 +65,10 @@ We provide below detailed information on how to install and run SUPPA. Please jo
 
 SUPPA has been developed in Python 3.4. 
 
-If necessary, to install python3 we recommend to download from the official site ( https://www.python.org/downloads/ ) the corresponding version for your OS.
+SUPPA can be installed directly from Python Package Index (PyPI) by running the following command:
 
-SUPPA uses the following modules:
-
-- SciPy ( 0.15.1 )
-- NumPy ( 1.11.0 )
-- Pandas ( 0.18.0 )
-- statsmodels ( 0.6.1 )
-- scikit-learn ( 0.16.1 )
-
-In case you do not have already these modules, we reccomend to use pip3 to install the specific version of the modules. To install pip3, please go to the official site ( https://pip.pypa.io/en/latest/installing/ ),
-download the file "get-pip.py", and run the following command:
 ```
-python3 get-pip.py
-sudo pip3 install --upgrade pip3
-```
-
-Then, to install the modules:
-```
-sudo pip3 install scipy==0.15.1 numpy==1.11.0 pandas==0.18.0 statsmodels==0.6.1 scikit-learn==0.16.1
+pip install SUPPA==2.2.1 
 ```
 
 SUPPA is ready to use. Once downloaded, it can be used directly from the command line.
@@ -448,9 +432,15 @@ List of options available:
 
 - **-al** | **--alpha**: Family-wise error rate to use for the multiple test correction. (Default: 0.05).
 
+-  **-s** | **--save_tpm_events**: Boolean. If True, the average log TPM of the events will be saved in an external file (Default: False).
+
+-  **-c** | **--combination**: Boolean. If True, SUPPA perform the analysis between all the possible combinations of conditions (Default: False).
+-  **-me** | **--median**: Boolean. If True, SUPPA use the median to calculate the Delta PSI. (Default: False).
+-  **-th TPM_TH** | **--tpm-threshold TPM_TH**: Minimum transcript average TPM value within-replicates and between-conditions to be included in the analysis. (Default: 1.0).
+
 - **-o** | **--output**: Name of the output
 
-- **-h**  | **--help**: display the help message describing the different parameters
+- **-h** | **--help**: display the help message describing the different parameters
 
 An example of the usage of the program is:
 
