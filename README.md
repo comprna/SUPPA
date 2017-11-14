@@ -435,8 +435,10 @@ List of options available:
 -  **-s** | **--save_tpm_events**: Boolean. If True, the average log TPM of the events will be saved in an external file (Default: False).
 
 -  **-c** | **--combination**: Boolean. If True, SUPPA perform the analysis between all the possible combinations of conditions (Default: False).
+
 -  **-me** | **--median**: Boolean. If True, SUPPA use the median to calculate the Delta PSI. (Default: False).
--  **-th TPM_TH** | **--tpm-threshold TPM_TH**: Minimum transcript average TPM value within-replicates and between-conditions to be included in the analysis. (Default: 1.0).
+
+-  **-th TPM_TH** | **--tpm-threshold TPM_TH**: Minimum expression (calculated as average TPM value within-replicates and between-conditions) to be included in the analysis. (Default: 0).
 
 - **-o** | **--output**: Name of the output
 
@@ -448,7 +450,7 @@ An example of the usage of the program is:
 suppa.py diffSplice --method <empirical> --ioe <ioe-file> --psi <Cond1.psi> <Cond2.psi> --expression-file <Cond1_expression-file> <Cond2_expression-file> --area <1000> --lower-bound <0.05> -gc -o <output-file>
 ```
 
-**Note:** ΔPSI values are calculated pairwise between each pair of adjacent conditions as provided, and calculating the PSI different between a given condition and the previous one. For instance, for three conditions 1,2,3, the ΔPSI values will be calculated for 3 - 2 and 2 - 1. 
+**Note:** ΔPSI values are calculated pairwise between each pair of adjacent conditions as provided, and calculating the PSI different between a given condition and the previous one. For instance, for three conditions 1,2,3, the ΔPSI values will be calculated for 3 - 2 and 2 - 1.
 
 ## Output files
 
@@ -460,13 +462,13 @@ The differential splicing operation generates a *dpsi* file and a *psivec* file.
 *dpsi* is a tab separated file, with the event ID in the first column, followed by a variable even number of fields, two for each pair of conditions being compared:
 
 
-1. **Cond1_Cond2_dPSI**: Event PSI difference (ΔPSI) between Cond2 and Cond1.
+1. **Cond2_Cond1_dPSI**: Event PSI difference (ΔPSI) between Cond1 and Cond2 (ΔPSI = PSI_2 - PSI_1).
 
-2. **Cond1_Cond2_pvalue**: Significance of the difference of PSI between Cond2 and Cond1
+2. **Cond2_Cond1_pvalue**: Significance of the difference of PSI between Cond1 and Cond2 (ΔPSI = PSI_2 - PSI_1).
 
 An example of an *dpsi* file is the following one:
 ```
-Cond1_Cond2_dPSI  Cond1_Cond2_p-val
+Cond2_Cond1_dPSI  Cond2_Cond1_p-val
 ENSG00000000003;A5:chrX:99890743-99891188:99890743-99891605:- nan 1.0
 ENSG00000000419;A3:chr20:49557492-49558568:49557470-49558568:-  0.1307455855  0.0484515485
 ENSG00000000419;SE:chr20:49557470-49557642:49557746-49558568:-  0.0469449126  0.0954045953
@@ -502,7 +504,7 @@ Using the PSI values in all samples, and the information of which events change 
 
 A **dpsi** file and **psivec** file are required (see definitions above). The dpsi file contains the information about which events are signficantly differentially spliced in each pairwise comparison. For instance, a dpsi file with data from the comparison of three conditions will look like:
 ```
-Cond1_Cond2_dPSI  Cond1_Cond2_p-val Cond2_Cond3_dPSI  Cond2_Cond3_p-val
+Cond2_Cond1_dPSI  Cond2_Cond1_p-val Cond3_Cond2_dPSI  Cond3_Cond2_p-val
 event1    <dpsi_value>    <dpsi_value>    <dpsi_value>    <dpsi_value>
 event2    <dpsi_value>    <dpsi_value>    <dpsi_value>    <dpsi_value>
 event3    <dpsi_value>    <dpsi_value>    <dpsi_value>    <dpsi_value>
