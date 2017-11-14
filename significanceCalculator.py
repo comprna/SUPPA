@@ -112,7 +112,7 @@ parser.add_argument('-th', '--tpm-threshold',
                     action="store",
                     nargs=1,
                     type=float,
-                    default=[1.0],
+                    default=[0.0],
                     help="Minimum transcript average TPM value within-replicates and between-conditions to be included in the analysis. (Default: 1.0).")
 
 def nan_threshold_type(x):
