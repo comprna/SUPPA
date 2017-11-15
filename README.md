@@ -445,6 +445,8 @@ List of options available:
 
 -  **-th** | **--tpm-threshold**: Minimum expression (calculated as average TPM value within-replicates and between-conditions) to be included in the analysis. (Default: 0).
 
+-  **-nan** | **--nan-threshold**: Percentage allowed of samples per condition with nan values for returning a DeltaPSI (Default: 0, no missing values allowed).
+
 - **-o** | **--output**: Name of the output
 
 - **-h** | **--help**: display the help message describing the different parameters
@@ -455,8 +457,6 @@ An example of the usage of the program is:
 python3 suppa.py diffSplice --method <empirical> --ioe <ioe-file> --psi <Cond1.psi> <Cond2.psi> --expression-file <Cond1_expression-file> <Cond2_expression-file> --area <1000> --lower-bound <0.05> -gc -o <output-file>
 ```
 
-**Note:** ΔPSI values are calculated pairwise between each pair of adjacent conditions as provided, and calculating the PSI different between a given condition and the previous one. For instance, for three conditions 1,2,3, the ΔPSI values will be calculated for 3 - 2 and 2 - 1. 
-
 ## Output files
 
 The differential splicing operation generates a *dpsi* file and a *psivec* file. 
@@ -466,11 +466,9 @@ The differential splicing operation generates a *dpsi* file and a *psivec* file.
 
 *dpsi* is a tab separated file, with the event ID in the first column, followed by a variable even number of fields, two for each pair of conditions being compared:
 
-
 1. **Cond1_Cond2_dPSI**: Event PSI difference (ΔPSI) between Cond1 and Cond2 (ΔPSI = PSI_2 - PSI_1).
 
 2. **Cond1_Cond2_pvalue**: Significance of the difference of PSI between Cond1 and Cond2
-
 
 An example of an *dpsi* file is the following one:
 ```
@@ -480,6 +478,9 @@ ENSG00000000419;A3:chr20:49557492-49558568:49557470-49558568:-  0.1307455855  0.
 ENSG00000000419;SE:chr20:49557470-49557642:49557746-49558568:-  0.0469449126  0.0954045953
 ENSG00000000419;SE:chr20:49557470-49557666:49557746-49558568:-  0.0164051352  0.1518481518
 ```
+If **--combination** flag is set to FALSE, ΔPSI values are calculated pairwise between each pair of adjacent conditions as provided, and calculating the PSI different between a given condition and the previous one. For instance, for three conditions 1,2,3, the ΔPSI values will be calculated for 2 - 1 (Cond1_Cond2_dPSI) and 3 - 2 (Cond2_Cond3_dPSI). 
+By contrast, if  **--combination** flag is set to TRUE, ΔPSI values are calculated pairwise between all the possible combinations conditions. For the previous example conditions 1,2,3, the ΔPSI values will be calculated for 2 - 1 (Cond1_Cond2_dPSI), 3 - 1 (Cond1_Cond3_dPSI) and 3 - 2 (Cond2_Cond3_dPSI).
+
 
 ### psivec file
 
