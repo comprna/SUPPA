@@ -443,7 +443,7 @@ List of options available:
 
 -  **-me** | **--median**: Boolean. If True, SUPPA use the median to calculate the Delta PSI. (Default: False).
 
--  **-th TPM_TH** | **--tpm-threshold TPM_TH**: Minimum expression (calculated as average TPM value within-replicates and between-conditions) to be included in the analysis. (Default: 0).
+-  **-th** | **--tpm-threshold**: Minimum expression (calculated as average TPM value within-replicates and between-conditions) to be included in the analysis. (Default: 0).
 
 - **-o** | **--output**: Name of the output
 
