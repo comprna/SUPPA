@@ -440,8 +440,10 @@ List of options available:
 -  **-s** | **--save_tpm_events**: Boolean. If True, the average log TPM of the events will be saved in an external file (Default: False).
 
 -  **-c** | **--combination**: Boolean. If True, SUPPA perform the analysis between all the possible combinations of conditions (Default: False).
+
 -  **-me** | **--median**: Boolean. If True, SUPPA use the median to calculate the Delta PSI. (Default: False).
--  **-th TPM_TH** | **--tpm-threshold TPM_TH**: Minimum transcript average TPM value within-replicates and between-conditions to be included in the analysis. (Default: 1.0).
+
+-  **-th TPM_TH** | **--tpm-threshold TPM_TH**: Minimum expression (calculated as average TPM value within-replicates and between-conditions) to be included in the analysis. (Default: 0).
 
 - **-o** | **--output**: Name of the output
 
@@ -465,9 +467,10 @@ The differential splicing operation generates a *dpsi* file and a *psivec* file.
 *dpsi* is a tab separated file, with the event ID in the first column, followed by a variable even number of fields, two for each pair of conditions being compared:
 
 
-1. **Cond1_Cond2_dPSI**: Event PSI difference (ΔPSI) between Cond2 and Cond1.
+1. **Cond1_Cond2_dPSI**: Event PSI difference (ΔPSI) between Cond1 and Cond2 (ΔPSI = PSI_2 - PSI_1).
 
 2. **Cond1_Cond2_pvalue**: Significance of the difference of PSI between Cond2 and Cond1
+
 
 An example of an *dpsi* file is the following one:
 ```
