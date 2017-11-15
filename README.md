@@ -469,7 +469,7 @@ The differential splicing operation generates a *dpsi* file and a *psivec* file.
 
 1. **Cond1_Cond2_dPSI**: Event PSI difference (ΔPSI) between Cond1 and Cond2 (ΔPSI = PSI_2 - PSI_1).
 
-2. **Cond1_Cond2_pvalue**: Significance of the difference of PSI between Cond2 and Cond1
+2. **Cond1_Cond2_pvalue**: Significance of the difference of PSI between Cond1 and Cond2
 
 
 An example of an *dpsi* file is the following one:
