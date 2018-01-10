@@ -199,6 +199,9 @@ def parse_gtf_line(line, l_count, logger):
         return
     # parsing the attributes
     attributes = [att.split(' ', 1) for att in line[-1].strip(';').split('; ')]
+    #Some gtf has an extra space in column 9 (like GRCh37 v67 Ensembl). Remove this space if it's in there and reformat the attribute
+    if(attributes[0][0]==""):
+        attributes[0] = attributes[0][1].split(" ")
     att_dict = dict(map(lambda x: (x[0], x[1].strip('"')), attributes))
     if 'gene_id' not in att_dict or 'transcript_id' not in att_dict:
         logger.info('Missing gene_id or transcript_id field in line {}'.format(l_count))
