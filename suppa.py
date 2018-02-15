@@ -69,6 +69,11 @@ logger = logging.getLogger(__name__)
 
 
 def main():
+
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(1)
+
     try:
         args = parser.parse_args()
         if args.which == "generateEvents":
