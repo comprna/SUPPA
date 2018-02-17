@@ -14,6 +14,7 @@ import os
 import sys
 import math
 import logging
+import warnings
 import numpy as np
 import pandas as pd
 from functools import reduce
@@ -110,12 +111,15 @@ def calculate_delta_psi(psi_values, median, nan_th):
                 dt[event].append(dpsi_val)
 
             else:
+                # Ignore empty slice warning when calculating the mean/median
+                with warnings.catch_warnings():
+                    warnings.filterwarnings('ignore', r'Mean of empty slice')
 
-                abs_dpsi_val = abs(np.nanmean(psi_values_1) - np.nanmean(psi_values_0))
-                abs_dt[event].append(abs_dpsi_val)
+                    abs_dpsi_val = abs(np.nanmean(psi_values[event][1]) - np.nanmean(psi_values[event][0]))
+                    abs_dt[event].append(abs_dpsi_val)
 
-                dpsi_val = np.nanmean(psi_values_1) - np.nanmean(psi_values_0)
-                dt[event].append(dpsi_val)
+                    dpsi_val = np.nanmean(psi_values[event][1]) - np.nanmean(psi_values[event][0])
+                    dt[event].append(dpsi_val)
 
     # Flatten the list of list of the dictionary values
     dpsi_abs_values = {k: sum(v) for k, v in abs_dt.items()}
@@ -260,14 +264,14 @@ def slice_list(lst, index, slice_len):
 
 def calculate_empirical_pvalue(local_area, dpsi_abs_value):
 
-        #Get the absolute values from the local_area (replicates distribution)
-        abs_local_area = [abs(val) for val in local_area]
-        ecdf = ECDF(abs_local_area)
-        # ecdf = ECDF(local_area)
-        # It is divided by 2 because we are using abs(deltaPSI) values and therefore it is a one-tailed test
-        event_pvalue = (1.0 - ecdf(dpsi_abs_value)) * 0.5
+    abs_local_area = [abs(val) for val in local_area]
 
-        return event_pvalue
+    ecdf = ECDF(abs_local_area)
+
+    # It is divided by 2 because we are using abs(deltaPSI) values and therefore it is a one-tailed test
+    event_pvalue = (1.0 - ecdf(dpsi_abs_value)) * 0.5
+
+    return event_pvalue
 
 
 def calculate_between_conditions_distribution(cond1, cond2, tpm1, tpm2, ioe, save_tpm, median, tpm_th, nan_th, output):
@@ -481,6 +485,8 @@ def merge_temp_output_files(output):
         if ".dpsi.temp." in fl:
             os.remove(current_path+fl)
 
+    return os.path.abspath("%s.dpsi" % output)
+
 
 def write_psivec_file(psi_lst, output):
 
@@ -506,6 +512,8 @@ def write_psivec_file(psi_lst, output):
 
     with open("%s.psivec" % output, "a") as fh:
             merged_psi_results.to_csv(fh, sep="\t", na_rep="nan", header=False)
+
+    return os.path.abspath("%s.psivec" % output)
 
 
 def empirical_test(cond1, tpm1, cond2, tpm2, ioe, area, cutoff, save_tpm, median, tpm_th, nan_th, output):
@@ -644,6 +652,7 @@ def multiple_conditions_analysis(method, psi_lst, tpm_lst, ioe, area, cutoff, pa
               "" % (cond1_name, cond2_name))
 
         if method == 'empirical':
+            #event_lst, uncorrected_pvals, dpsi_vals, discarded_dt = empirical_test(cond1, tpm1, cond2, tpm2,ioe, area, cutoff)
             event_lst, uncorrected_pvals, dpsi_vals, discarded_dt = empirical_test(cond1, tpm1, cond2, tpm2, ioe, area,
                                                                                    cutoff, save_tpm, median, tpm_th,
                                                                                    nan_th, output)
@@ -668,10 +677,10 @@ def multiple_conditions_analysis(method, psi_lst, tpm_lst, ioe, area, cutoff, pa
 
         dpsi_pval_values.update(discarded_dt)
 
-        log10_pvalues, events_significance = convert_to_log10pval(dpsi_pval_values, sig_threshold=0.05)
+        # Commented out while creating plot functionality and fixing "min() empty" bug
+        # log10_pvalues, events_significance = convert_to_log10pval(dpsi_pval_values, sig_threshold=0.05)
 
         write_temp_output_files(dpsi_pval_values, output, i, cond1_name, cond2_name)
 
-    merge_temp_output_files(output)
-
-    write_psivec_file(psi_lst, output)
+    dpsi_fl_path = merge_temp_output_files(output)
+    psivec_fl_path = write_psivec_file(psi_lst, output)

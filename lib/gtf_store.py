@@ -159,7 +159,6 @@ class Gene():
             new_gene.sortedTranscripts = self.sortedTranscripts[idxs[i-1]:idxs[i]]
             new_gene.transcripts = {xtranscript: self.transcripts[xtranscript]
                                     for xtranscript in new_gene.sortedTranscripts}
-
             new_genes.append(new_gene)
         return new_genes
 
@@ -231,6 +230,5 @@ def gtf_reader(parse_file, logger):
             l_count += 1
             results = parse_gtf_line(line, l_count, logger)
             if results:
-                # results
                 all_results.append(results)
     return all_results

@@ -58,8 +58,6 @@ def main():
     expression_dictionary_events = {}  # to store the expression values calculated [event_id] = {[colId] = expression}
     col_ids = []  # to store all the column_id for the expression fields
     try:
-
-            
         #Buffering EXPRESSION FILE
         factory = FactoryReader()
         r = factory.getReader("expression")

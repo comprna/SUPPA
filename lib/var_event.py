@@ -34,7 +34,7 @@ class VariableEvent(Event):
         """
         for event in self.positive_ids:
             pos_trans = ','.join(sorted(self.positive_ids[event]))
-            all_trans = ','.join(sorted(self.positive_ids[event] + self.negative_ids[event]))
+            all_trans = ','.join(list(set(sorted(self.positive_ids[event] + self.negative_ids[event]))))
             full_event = '{};{}:{}'.format(self.gene.name, self.etype, event)
 
             yield ('{}\t{}\t{}\t{}\t{}\n'.format(self.gene.chr, self.gene.name, full_event,
