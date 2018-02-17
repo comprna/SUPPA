@@ -9,21 +9,24 @@ Read our [short SUPPA tutorial on an example dataset](https://github.com/comprna
    * [Set up](#set-up)
       * [Requirements](#requirements)
    * [Command and subcommand structure](#command-and-subcommand-structure)
-   * [Event generation](#event-generation)
+   * [Generation of transcript events and local alternative splicing events](#generation-of-transcript-events-and-local-alternative-splicing-events)
       * [Input files](#input-files)
       * [Command and options](#command-and-options)
       * [Output files](#output-files)
+         * [ioi](#ioi)
          * [ioe](#ioe)
-         * [GTF](#gtf)
-   * [PSI calculation for each event](#psi-calculation-for-each-event)
+         * [gtf](#GTF-for-local-events)
+   * [PSI calculation for Transcripts and Events](#psi-calculation-for-transcripts-and-events)
       * [Input files](#input-files-1)
-      * [Command and options](#command-and-options-1)
+         * [PSI per transcript Isoform](#psi-per-transcript-isoform)
+         * [PSI per local event](#psi-per-local-event)
       * [Output files](#output-files-1)
-   * [PSI calculation for each isoform](#psi-calculation-for-each-isoform)
    * [Combining multiple expression files](#combining-multiple-expression-files)
-   * [Differential splicing analysis](#differential-splicing-analysis)
+   * [Differential splicing analysis for transcripts and local events](#differential-splicing-analysis-for-transcripts-and-local-events)
       * [Input files](#input-files-2)
       * [Command and options](#command-and-options-2)
+      * [Differential transcript usage](#differential-transcript-usage)
+      * [Differential splicing with local events](#differential-splicing-with-local-events)
       * [Output files](#output-files-2)
          * [dpsi file](#dpsi-file)
          * [psivec file](#psivec-file)
@@ -33,6 +36,7 @@ Read our [short SUPPA tutorial on an example dataset](https://github.com/comprna
       * [Output files](#output-files-3)
          * [clustvec](#clustvec)
    * [License](#license)
+
 
 ----------------------------
 # Overview
@@ -204,7 +208,7 @@ python3.4 suppa.py generateEvents -i <input-file.gtf> -o <output-file> -f ioi
 
 For transcripts, the *generateEvents* operation outputs one single file: An *ioi* file that shows the transcript "events" in each gene. This is a tab separated file with the following fields
 
-**ioi**
+### **ioi**
 -------
 
 1. **seqname**: field 1 from the input GTF file of the generateEvents operation (generally the chromosome name)
@@ -248,7 +252,7 @@ The name of the output is generated as follows:
 
 The ioe file has the following fields:
 
-**ioe**
+### **ioe**
 -------
 
 
