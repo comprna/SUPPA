@@ -422,8 +422,7 @@ python3.4 suppa.py psiPerEvent --ioe-file <ioe-file> --expression-file <expressi
 
 These operations generate a *psi* file per each expression file. This file follows a similar format to the input expression file used in the *psiPerEvent* operation, where in the first column you find the event ID (transcript event or local AS event ID), and the following columns you find the PSI values in each sample. The PSI values are normalized between 0 and 1 ([0,1]). There are two exceptions for the PSI value:
 
-- **-1**: PSI = -1 if the expression is 0 for all the transcripts involved in the event or if the event does not pass any the transcript expression filter (see *PSI calculation, Command and options*). (*Note: this will be changed to be "NA" in the near future*).
-- **NA**: PSI = NA if one or more transcripts of the event do not appear in the expression file.
+- **NA**: PSI = if the expression is 0 for all the transcripts involved in the event or if the event does not pass any the transcript expression filter (see *PSI calculation, Command and options*). Also if one or more transcripts of the event do not appear in the expression file, an NA will be returned
 
 
 Example of a PSI file for transcript "events":
