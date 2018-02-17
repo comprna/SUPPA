@@ -15,7 +15,7 @@ Read our [short SUPPA tutorial on an example dataset](https://github.com/comprna
       * [Output files](#output-files)
          * [ioi](#ioi)
          * [ioe](#ioe)
-         * [gtf](#GTF-for-local-events)
+         * [gtf](#gtf-for-local-events)
    * [PSI calculation for Transcripts and Events](#psi-calculation-for-transcripts-and-events)
       * [Input files](#input-files-1)
          * [PSI per transcript Isoform](#psi-per-transcript-isoform)
