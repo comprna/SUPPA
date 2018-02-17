@@ -4,11 +4,14 @@ Created on Wed May 25 04:20:00 CEST 2016
 
 @authors: Juan C Entizne
 @email: juancarlos.entizne01[at]estudiant.upf.edu
+
+Modified by Juan L. Trincado
+@email: juanluis.trincado[at].upf.edu
+
 """
 
 import os
 import sys
-import time
 import math
 import logging
 import warnings
@@ -70,24 +73,41 @@ def get_psi_values(dict1, dict2):
 
     return psi_values
 
+def get_proportion_nans(psi_list):
 
-def calculate_delta_psi(psi_values, median=False):
+    count = 0
+    for x in psi_list:
+        if(math.isnan(x)):
+            count += 1
+    size = len(psi_list)
+    return float(count)/float(size)
+
+
+def calculate_delta_psi(psi_values, median, nan_th):
 
     abs_dt, dt, discarded_events = (defaultdict(list) for _ in range(3))
     for event in psi_values:
 
-        # Strict form to calculate deltaPSI: event excluded if -1.0 in either condition
-        if -1.0 in psi_values[event][0] or -1.0 in psi_values[event][1]:
+        #Get the proportion of missing values in an event
+        prop0 = get_proportion_nans(psi_values[event][0])
+        prop1 = get_proportion_nans(psi_values[event][1])
+
+        # event will be excluded if any of the proportions overtake the nan_threshold
+        if nan_th < prop0 or nan_th < prop1:
             discarded_events[event].append([float("nan"), 1.0000000000])
 
         else:
 
+            #if passes the threshold, remove all the nan values form each list
+            psi_values_0 = [x for x in psi_values[event][0] if str(x) != 'nan']
+            psi_values_1 = [x for x in psi_values[event][1] if str(x) != 'nan']
+
             if median:
 
-                abs_dpsi_val = abs(np.nanmedian(psi_values[event][1]) - np.nanmedian(psi_values[event][0]))
+                abs_dpsi_val = abs(np.nanmedian(psi_values_1) - np.nanmedian(psi_values_0))
                 abs_dt[event].append(abs_dpsi_val)
 
-                dpsi_val = np.nanmedian(psi_values[event][1]) - np.nanmedian(psi_values[event][0])
+                dpsi_val = np.nanmedian(psi_values_1) - np.nanmedian(psi_values_0)
                 dt[event].append(dpsi_val)
 
             else:
@@ -139,7 +159,12 @@ def get_tpm_values(tpm1_values, tpm2_values, transcripts_values):
     return tpm_values
 
 
-def calculate_transcript_abundance(tpm_values):
+def calculate_transcript_abundance(tpm_values, tpm_th):
+
+    if(tpm_th!=0):
+        tpm_th_log10 = math.log10(tpm_th)
+    else:
+        tpm_th_log10 = -float('Inf')
 
     temp_between_conditions_logtpm = defaultdict(list)
     for event in tpm_values:
@@ -151,10 +176,11 @@ def calculate_transcript_abundance(tpm_values):
             replicates_transcript_values = list(zip(*transcript_vals))
 
             try:
-                replicates_logtpms = [math.log10(sum(replicate_tpms)) for replicate_tpms in replicates_transcript_values]
+                replicates_logtpms = [math.log10(sum(rep_tpms)) for rep_tpms in replicates_transcript_values]
                 average_replicate_transcript_abundance = sum(replicates_logtpms)/len(replicates_logtpms)
 
-                conditions_average_logtpm.append(average_replicate_transcript_abundance)
+                if average_replicate_transcript_abundance >= tpm_th_log10:
+                    conditions_average_logtpm.append(average_replicate_transcript_abundance)
 
             except:
                 pass
@@ -163,7 +189,8 @@ def calculate_transcript_abundance(tpm_values):
         if len(conditions_average_logtpm) == 2.0:
             between_conditions_average_transcript_abundance = 0.5 * sum(conditions_average_logtpm)
 
-            temp_between_conditions_logtpm[event].append(between_conditions_average_transcript_abundance)
+            if between_conditions_average_transcript_abundance >= tpm_th_log10:
+                temp_between_conditions_logtpm[event].append(between_conditions_average_transcript_abundance)
         else:
             pass
 
@@ -247,13 +274,13 @@ def calculate_empirical_pvalue(local_area, dpsi_abs_value):
     return event_pvalue
 
 
-def calculate_between_conditions_distribution(cond1, cond2, tpm1, tpm2, ioe):
+def calculate_between_conditions_distribution(cond1, cond2, tpm1, tpm2, ioe, save_tpm, median, tpm_th, nan_th, output):
 
         cond1_psi_values = create_dict(cond1)
         cond2_psi_values = create_dict(cond2)
         psi_values = get_psi_values(cond1_psi_values, cond2_psi_values)
 
-        dpsi_abs_values, dpsi_values, discarded_events = calculate_delta_psi(psi_values)
+        dpsi_abs_values, dpsi_values, discarded_events = calculate_delta_psi(psi_values, median, nan_th)
 
         transcripts_values = get_events_transcripts(ioe)
 
@@ -261,7 +288,20 @@ def calculate_between_conditions_distribution(cond1, cond2, tpm1, tpm2, ioe):
         tpm2_values = create_dict(tpm2)
         tpm_values = get_tpm_values(tpm1_values, tpm2_values, transcripts_values)
 
-        between_conditions_avglogtpm = calculate_transcript_abundance(tpm_values)
+        between_conditions_avglogtpm = calculate_transcript_abundance(tpm_values, tpm_th)
+
+        if save_tpm:
+            #Save between_conditions_avglogtpm object
+            print("Saving between_conditions_avglogtpm...")
+            output = output + "_avglogtpm.tab"
+            outFile = open(output, 'w')
+            for key in between_conditions_avglogtpm.keys():
+                line = key + "\t" + str(between_conditions_avglogtpm[key]) + "\n"
+                outFile.write(line)
+            outFile.close()
+
+            print("Saved "+output)
+
         between_conditions_absdpsi_logtpm = merge_dict(dpsi_abs_values, between_conditions_avglogtpm)
 
         return between_conditions_absdpsi_logtpm, psi_values, tpm_values, dpsi_abs_values, dpsi_values, discarded_events
@@ -353,6 +393,9 @@ def calculate_events_pvals(between_conditions_distribution,
             event_pval = calculate_empirical_pvalue(local_dpsi, between_cond_obs_dpsi)
             uncorrected_pvals.append(event_pval)
             event_lst.append(event)
+
+    progressbar("Calculating events empirical p-value:", i+1, lst_len)
+    print("\nDone!\n")
 
     return event_lst, uncorrected_pvals
 
@@ -473,10 +516,10 @@ def write_psivec_file(psi_lst, output):
     return os.path.abspath("%s.psivec" % output)
 
 
-def empirical_test(cond1, tpm1, cond2, tpm2, ioe, area, cutoff):
+def empirical_test(cond1, tpm1, cond2, tpm2, ioe, area, cutoff, save_tpm, median, tpm_th, nan_th, output):
 
     between_conditions_distribution, psi_dict, tpm_dict, abs_dpsi_dict, dpsi_vals, discarded_dt \
-        = calculate_between_conditions_distribution(cond1, cond2, tpm1, tpm2, ioe)
+        = calculate_between_conditions_distribution(cond1, cond2, tpm1, tpm2, ioe, save_tpm, median, tpm_th, nan_th, output)
 
     replicates_distribution = create_replicates_distribution(between_conditions_distribution, psi_dict, tpm_dict)
 
@@ -486,7 +529,7 @@ def empirical_test(cond1, tpm1, cond2, tpm2, ioe, area, cutoff):
     return event_lst, uncorrected_pvals, dpsi_vals, discarded_dt
 
 
-def classical_test(cond1, cond2, paired):
+def classical_test(cond1, cond2, paired, median):
 
     if paired:
         test = wilcoxon
@@ -511,7 +554,7 @@ def classical_test(cond1, cond2, paired):
             event_lst.append(i)
             uncorrected_pvals.append(pval)
 
-    _, dpsi_vals, discarded_dt = calculate_delta_psi(psi_dict)
+    _, dpsi_vals, discarded_dt = calculate_delta_psi(psi_dict, median)
 
     return event_lst, uncorrected_pvals, dpsi_vals, discarded_dt
 
@@ -585,16 +628,21 @@ def convert_to_log10pval(dpsi_pval_values, sig_threshold=0.05, dpsi_threshold=0.
     return log10_pvalues, events_significance
 
 
-def multiple_conditions_analysis(method, psi_lst, tpm_lst, ioe, area, cutoff, paired, gene_cor, alpha, output):
+def multiple_conditions_analysis(method, psi_lst, tpm_lst, ioe, area, cutoff, paired, gene_cor, alpha,
+                                 save_tpm, comb, median, tpm_th, nan_th, output):
 
     # Setting logging preferences
     logger = logging.getLogger(__name__)
 
-    # Pair the conditions in a sequential manner
     z_lst = list(zip(psi_lst, tpm_lst))
-    seq_lst = sliding_windows(z_lst)
 
-    for i, paired_cond_tpm in enumerate(list(seq_lst)):
+    # Pair the conditions in a sequential manner or in all possible combinations
+    if not comb:
+        seq_lst = list(sliding_windows(z_lst))
+    else:
+        seq_lst = list(combinations(z_lst, r=2))
+
+    for i, paired_cond_tpm in enumerate(seq_lst):
         cond1, tpm1 = paired_cond_tpm[0][0], paired_cond_tpm[0][1]
         cond2, tpm2 = paired_cond_tpm[1][0], paired_cond_tpm[1][1]
 
@@ -604,12 +652,14 @@ def multiple_conditions_analysis(method, psi_lst, tpm_lst, ioe, area, cutoff, pa
               "" % (cond1_name, cond2_name))
 
         if method == 'empirical':
-            event_lst, uncorrected_pvals, dpsi_vals, discarded_dt = empirical_test(cond1, tpm1, cond2, tpm2,
-                                                                                   ioe, area, cutoff)
+            #event_lst, uncorrected_pvals, dpsi_vals, discarded_dt = empirical_test(cond1, tpm1, cond2, tpm2,ioe, area, cutoff)
+            event_lst, uncorrected_pvals, dpsi_vals, discarded_dt = empirical_test(cond1, tpm1, cond2, tpm2, ioe, area,
+                                                                                   cutoff, save_tpm, median, tpm_th,
+                                                                                   nan_th, output)
             corrected_pvals_dict = {k: v for k, v in zip(event_lst, uncorrected_pvals)}
 
         elif method == 'classical':
-            event_lst, uncorrected_pvals, dpsi_vals, discarded_dt = classical_test(cond1, cond2, paired)
+            event_lst, uncorrected_pvals, dpsi_vals, discarded_dt = classical_test(cond1, cond2, paired, median)
             corrected_pvals_dict = multiple_test_correction(event_lst, uncorrected_pvals, alpha)
 
         else:

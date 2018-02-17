@@ -4,12 +4,16 @@ Created on Wed May 25 04:20:00 CEST 2016
 
 @authors: Juan C Entizne
 @email: juancarlos.entizne01[at]estudiant.upf.edu
+
+Modified by Juan L. Trincado
+@email: juanluis.trincado[at].upf.edu
+
 """
 
 import os
 import logging
 from lib.diff_tools import multiple_conditions_analysis
-from argparse import ArgumentParser, RawTextHelpFormatter
+from argparse import *
 
 
 description = \
@@ -86,6 +90,45 @@ parser.add_argument('-al', '--alpha',
                     default=[0.05],
                     help="Family-wise error rate to use for the multiple test correction. (Default: 0.05).")
 
+parser.add_argument('-s', '--save_tpm_events',
+                    action="store_true",
+                    default=False,
+                    help="Boolean. If True, the average log TPM of the events will be saved in an external file (Default: False).")
+
+parser.add_argument('-c', '--combination',
+                    action="store_true",
+                    dest="seq",
+                    default=False,
+                    help="Boolean. If True, SUPPA perform the analysis between all the possible combinations of conditions (Default: False).")
+
+parser.add_argument('-me', '--median',
+                    dest="median",
+                    action="store_true",
+                    default=False,
+                    help="Boolean. If True, SUPPA use the median to calculate the Delta PSI. (Default: False).")
+
+parser.add_argument('-th', '--tpm-threshold',
+                    dest="tpm_th",
+                    action="store",
+                    nargs=1,
+                    type=float,
+                    default=[0.0],
+                    help="Minimum transcript average TPM value within-replicates and between-conditions to be included in the analysis. (Default: 1.0).")
+
+def nan_threshold_type(x):
+    x = float(x)
+    if x < 0.0 and x > 1.0:
+        raise ArgumentTypeError("nan_threshold should be a float number between 0 and 1")
+    return x
+
+parser.add_argument('-nan', '--nan-threshold',
+                    dest="nan_th",
+                    action="store",
+                    nargs=1,
+                    type=nan_threshold_type,
+                    default=[0.0],
+                    help="Percentage allowed of samples per condition with nan values for returning a DeltaPSI (Default: 0, no missing values allowed).")
+
 parser.add_argument('-o', '--output',
                     dest="output",
                     action="store",
@@ -135,8 +178,14 @@ def main():
                     "it must present the appropriate suffix.")
         exit(1)
 
-    multiple_conditions_analysis(args.method, cond_files, expr_files, ioe_fl[0], args.area[0], args.lower_bound[0],
-                                 args.paired, args.gene_cor, args.alpha[0], args.output)
+    #multiple_conditions_analysis(args.method, cond_files, expr_files, ioe_fl[0], args.area[0], args.lower_bound[0],
+     #                            args.paired, args.gene_cor, args.alpha[0], args.output)
+
+    multiple_conditions_analysis(args.method, cond_files, expr_files, ioe_fl[0], args.area[0],
+                                 args.lower_bound[0], args.paired, args.gene_cor, args.alpha[0],
+                                 args.save_tpm_events, args.seq, args.median, args.tpm_th[0],
+                                 args.nan_th[0],args.output)
+
 
 if __name__ == "__main__":
     main()

@@ -7,8 +7,6 @@ Created on Thu May 22 11:24:33 2014
 """
 
 import sys
-import os
-import pdb
 from argparse import ArgumentParser, RawTextHelpFormatter, SUPPRESS
 
 description = \
@@ -46,7 +44,7 @@ try:
     else:
         header = True
     #To remove the key-field from the selectedFields if it is there
-    for i in xrange(len(selectedFields)):
+    for i in range(len(selectedFields)):
         if selectedFields[i] == keyField:
             del selectedFields[i]
      
@@ -57,7 +55,7 @@ try:
     #Loop through all the files    
     for inputFile in filesList:
         seen_header = not header
-        print "INFO: Reading file: %s" % inputFile
+        print("INFO: Reading file: %s" % inputFile)
         lineNumber = 1
         with open(inputFile, 'r') as f:
             for l in f:
@@ -82,7 +80,7 @@ try:
                     dictionary[line[(keyField-1)]][inputFile].append(
                         str(line[(field-1)]))
                 lineNumber += 1
-        print "INFO: File %s closed." % inputFile
+        print("INFO: File %s closed." % inputFile)
     #Generating new header
     outputHeader = []
     for inputFile in filesList:
@@ -100,17 +98,18 @@ try:
             aux1 = inputFile.split("/")
             aux1.pop()
             aux2 = aux1.pop()
-            for x in xrange(1, len(selectedFields) + 1):
+            for x in range(1, len(selectedFields) + 1):
                 outputHeader.append(aux2)
                 #outputHeader.append(aux2 + "_" + str(x))
 
     #WRITING OUTPUT
-    print "INFO: Writing output to %s" % outputFile
+    print("INFO: Writing output to %s" % outputFile)
     f = open(outputFile, 'w')
     #Writing the header in the output file
     f.write("\t".join(outputHeader) + "\n")
     #Looping through all the unique IDs avoiding the "header" .
-    for key, value in [(x,y) for x, y in dictionary.iteritems() if x != "header"]:
+    for key, value in [(x,y) for x, y in dictionary.items() if x != "header"]:
+
         line = []
         line.append(key)    #Adding the common id
         for inputFile in filesList:
@@ -120,14 +119,13 @@ try:
             #If the unique id does not exist in inputFile
             else:
                 #Setting up to 0 all the selectedFields of inputfile
-                for x in xrange(len(selectedFields)):
+                for x in range(len(selectedFields)):
                     line.append(0)
         #Writing the line in the output
         f.write("\t".join(line) + "\n")
     f.close()
-    print "INFO: %s closed." % outputFile
-    print "INFO: Process ended succesfully."    
-except BaseException, err:
-    # print 'Error on line {}'.format(sys.exc_info()[-1].tb_lineno)
-    print "ERROR: %s" % err
-    sys.exit(1)    
+    print("INFO: %s closed." % outputFile)
+    print("INFO: Process ended succesfully.")
+except:
+    print("ERROR: %s" % err)
+    sys.exit(1)

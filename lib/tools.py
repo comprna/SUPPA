@@ -232,9 +232,48 @@ class PsiParser(Parser):
             return False
         except BaseException:
             logger.error("Unknown error: %s" % sys.exc_info()[1].args[0])
-            sys.exit(1)         
-            
-            
+            sys.exit(1)
+
+
+class TpmParser(Parser):
+    def __init__(self):
+        self.MIN_FIELDS = 2  # Number of fields
+        self.EVENT_ID_INDEX = 0
+        self.PSI_INDEX = 1
+
+    #    def parseLine(self, line, lineNumber, tableFormat = False):
+    def parseLine(self, line, lineNumber):
+        try:
+            msg = []  # It will containg the error message acummulated.
+            fields = line.rstrip('\n').split('\t')
+            # Parsing the number of fields
+            if len(fields) < self.MIN_FIELDS:
+                msg.append("Unexpeced number of fields.")
+            else:
+                # Checking for empty or blank(\s) fields
+                for empty in (i for i in range(self.MIN_FIELDS) if not \
+                        fields[i] or fields[i].isspace()):
+                    msg.append("Field %i empty or blank" % (empty + 1))
+
+                # Checking format of all psi fields
+                for i in range(1, self.MIN_FIELDS):
+                    try:
+                        float(fields[i])
+                    except ValueError:
+                        if fields[i] != "NA":
+                            msg.append("Field %i is not a float or \"NA\"." % (i + 1))
+                            break
+                if msg:
+                    raise FormatError(lineNumber, msg)
+            return True
+        except FormatError:
+            logger.error("%s, in line %i. Skipping line..." % (sys.exc_info()[1].args[0], lineNumber + 1))
+            return False
+        except BaseException:
+            logger.error("Unknown error: %s" % sys.exc_info()[1].args[0])
+            sys.exit(1)
+
+
 class Reader(object):
     '''Abstract Class with the common behaviour of all the readers.'''
     __metaclass__ = ABCMeta
@@ -421,7 +460,9 @@ class Writer(object):
                 logger.error("Error: These GTF and IOE writers no longer exist.")
                 sys.exit(1)
             elif fileFormat == "PSI":
-                return PsiWriter()                  
+                return PsiWriter()
+            elif fileFormat == "TPM":
+                return TpmWriter()
             else:
                 logger.error("Unknown writer:" + fileFormat)
                 sys.exit(1)
@@ -470,3 +511,25 @@ def ioi_writer(genome_obj, output_file):
                 line = "%s\t%s\t%s\t%s\t%s\n" % \
                        (chrm, gene_id, gene_id+";"+trans_id, trans_id, all_trans_ids)
                 fh.write(line)
+
+                
+class TpmWriter(Writer, TpmParser):
+    '''It conatains all the utilities required to write an PSI file.'''
+
+    def openFile(self, outputFile):
+        outputFile += ".tpm"
+        Writer.openFile(self, outputFile)
+
+    @staticmethod
+    def lineGenerator(key, value, colIds):
+        '''Generates a PSI line from a single event
+
+        key -- id of the event.
+        value -- the dictionary containning all column names and psi values calculated.
+        colIds -- list containing the column names
+        '''
+        line = []
+        line.append(key)
+        for x in colIds:
+            line.append(str(value[x]))
+        return line

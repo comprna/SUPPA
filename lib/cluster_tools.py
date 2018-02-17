@@ -2,18 +2,19 @@
 """
 Created on Wed May 25 04:20:00 CEST 2016
 
-@authors: Juan C Entizne
-@email: juancarlos.entizne01[at]estudiant.upf.edu
+@authors: Juan C Entizne, Juan L. Trincado
+@email: juancarlos.entizne01[at]estudiant.upf.edu,
+        juanluis.trincado[at]upf.edu
 """
 
 import os
-import sys
 import logging
-import numpy as np
 from itertools import islice
 from sklearn.cluster import DBSCAN
 from collections import defaultdict
 from sklearn.metrics import silhouette_score
+from lib.optics import *
+
 
 
 def sliding_windows(seq, n=2):
@@ -127,10 +128,12 @@ def process_cluster_input(dpsi, psivec, sig_threshold, dpsi_threshold, indexes):
                     psi_matrix.append(vals)
                     ev_id_lst.append(ev_id)
 
+    #psi_matrix is the average psi per condition (only for events that at least one of the comparisons yielded a significant comparison)
+    #ev_id_lst is just the list of the events included in the previous analysis
     return psi_matrix, ev_id_lst
 
 
-def cluster(psi_matrix, eventid_lst, dist, minpts, metric):
+def DBSCAN_cluster(psi_matrix, eventid_lst, dist, minpts, metric):
 
     # Setting logging preferences
     logger = logging.getLogger(__name__)
@@ -228,12 +231,53 @@ def calculate_cluster_scores(x, cluster_labels, output):
     return silhouette_avg, rmsstd_scores
 
 
-def cluster_analysis(dpsi, psivec, sig_threshold, dpsi_threshold, eps, minpts, metric, indexes, output):
+def create_points_list(psi_matrix, eventid_lst):
+    '''Generate a list of points from the psi_matrix'''
+    points_list = []
+    for i,x in enumerate(psi_matrix):
+        points_list.append(Point(eventid_lst[i],x))
+    return points_list
+
+def generate_labels(clusters, eventid_lst):
+    '''From the clusters generated from OPTICS, label the event_ids'''
+    eventid_labels_dict = {}
+    # Initialize to -1 both structures
+    for x in eventid_lst : eventid_labels_dict[x] = -1
+    labels = [-1 for x in range(len(eventid_lst))]
+
+    #Read clusters, annotating the cluster number for each event
+    if(len(clusters)!=0):
+        for number, cluster in enumerate(clusters):
+            for point in cluster.points:
+                eventid_labels_dict[point.id] = number
+                labels[eventid_lst.index(point.id)] = number
+
+    return eventid_labels_dict, labels
+
+
+def cluster_analysis(dpsi, psivec, sig_threshold, dpsi_threshold, eps, minpts, metric, indexes, clustering,
+                     separation, output):
 
     path = os.path.dirname(os.path.realpath(dpsi))
     os.chdir(path)
 
     psi_matrix, eventid_lst = process_cluster_input(dpsi, psivec, sig_threshold, dpsi_threshold, indexes)
-    eventid_labels_dict, labels = cluster(psi_matrix, eventid_lst, eps, minpts, metric)
-    write_averaged_cluster_output(psi_matrix, eventid_lst, eventid_labels_dict, output)
-    calculate_cluster_scores(psi_matrix, labels, output)
+
+    if(clustering=="DBSCAN"):
+        eventid_labels_dict, labels = DBSCAN_cluster(psi_matrix, eventid_lst, eps, minpts, metric)
+        #eventid_labels_dict are the labels of the clustering for eacg event
+
+        write_averaged_cluster_output(psi_matrix, eventid_lst, eventid_labels_dict, output)
+        calculate_cluster_scores(psi_matrix, labels, output)
+
+    else:
+        #OPTICS
+        points_list = create_points_list(psi_matrix, eventid_lst) #Transform the points on psi_matrix to Points from optics.py
+        optics = Optics(points_list, eps, minpts)  # Maximum radius to be considered, cluster size >= 2 points
+        optics.run()  # run the algorithm
+        clusters = optics.cluster(separation)  # minimum threshold for clustering (upper limit to separate the clusters)
+        eventid_labels_dict, labels = generate_labels(clusters, eventid_lst)
+        write_averaged_cluster_output(psi_matrix, eventid_lst, eventid_labels_dict, output)
+        calculate_cluster_scores(psi_matrix, labels, output)
+
+
