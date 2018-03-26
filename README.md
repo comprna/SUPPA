@@ -6,8 +6,7 @@ Read our [short SUPPA tutorial on an example dataset](https://github.com/comprna
 ----------------------------
 
    * [Overview](#overview)
-   * [Set up](#set-up)
-      * [Requirements](#requirements)
+   * [Installation](#installation)
    * [Command and subcommand structure](#command-and-subcommand-structure)
    * [Generation of transcript events and local alternative splicing events](#generation-of-transcript-events-and-local-alternative-splicing-events)
       * [Input files](#input-files)
@@ -62,16 +61,14 @@ We provide below detailed information on how to install and run SUPPA. Please jo
 
 
 ----------------------------
-# Set up
+# Installation
 ----------------------------
-
-## Requirements
 
 SUPPA has been developed in Python 3.4. 
 
 If necessary, to install python3 we recommend to download from the official site https://www.python.org/downloads/ the corresponding version for your OS.
 
-SUPPA uses the following modules:
+A installation using pip is available using the next command:
 
 ```
 pip install SUPPA==2.2.1 
@@ -83,6 +80,12 @@ pip show SUPPA
 ```
 
 SUPPA is ready to use. Once downloaded, it can be used directly from the command line by specifying the absolute path to the SUPPA executable (suppa.py).
+
+Another option is via bioconda (thanks to Devon Ryan)
+
+```
+conda install -c bioconda suppa
+```
 
 ----------------------------
 # Command and subcommand structure
