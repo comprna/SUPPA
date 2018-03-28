@@ -1,3 +1,7 @@
+SUPPA2
+
+Fast, accurate, and uncertainty-aware differential splicing analysis across multiple conditions https://www.ncbi.nlm.nih.gov/pubmed/29571299
+
 Here we provide an extensive explanation about how SUPPA works and all the running options.
 Read our [short SUPPA tutorial on an example dataset](https://github.com/comprna/SUPPA/wiki).
 
