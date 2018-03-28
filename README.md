@@ -1,4 +1,4 @@
-SUPPA2
+# SUPPA2
 
 Fast, accurate, and uncertainty-aware differential splicing analysis across multiple conditions https://www.ncbi.nlm.nih.gov/pubmed/29571299
 
