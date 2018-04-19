@@ -23,7 +23,9 @@ description = "Description:\n\n" + \
               "with replicates, and cluster events across conditions \n" \
               "For further information, see the help of each subcommand."
 
-parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter)
+parser = argparse.ArgumentParser(description=description, formatter_class=argparse.RawTextHelpFormatter, prog='SUPPA')
+# Version
+parser.add_argument('-v','--version', action='version', version='%(prog)s 2.3')
 subparsers = parser.add_subparsers()
 
 # EventGenerator parser
@@ -61,8 +63,6 @@ fileMergerSubparser = subparsers.add_parser(
     "joinFiles", parents=[joinFiles.parser],
     help="Join multiple tab separated files into a single file.")
 fileMergerSubparser.set_defaults(which="joinFiles")
-
-
 
 # Setting logging preferences
 logger = logging.getLogger(__name__)
