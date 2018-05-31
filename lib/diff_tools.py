@@ -529,7 +529,7 @@ def empirical_test(cond1, tpm1, cond2, tpm2, ioe, area, cutoff, save_tpm, median
     return event_lst, uncorrected_pvals, dpsi_vals, discarded_dt
 
 
-def classical_test(cond1, cond2, paired, median):
+def classical_test(cond1, cond2, paired, median, nan_th):
 
     if paired:
         test = wilcoxon
@@ -554,7 +554,7 @@ def classical_test(cond1, cond2, paired, median):
             event_lst.append(i)
             uncorrected_pvals.append(pval)
 
-    _, dpsi_vals, discarded_dt = calculate_delta_psi(psi_dict, median)
+    _, dpsi_vals, discarded_dt = calculate_delta_psi(psi_dict, median, nan_th)
 
     return event_lst, uncorrected_pvals, dpsi_vals, discarded_dt
 
@@ -659,7 +659,7 @@ def multiple_conditions_analysis(method, psi_lst, tpm_lst, ioe, area, cutoff, pa
             corrected_pvals_dict = {k: v for k, v in zip(event_lst, uncorrected_pvals)}
 
         elif method == 'classical':
-            event_lst, uncorrected_pvals, dpsi_vals, discarded_dt = classical_test(cond1, cond2, paired, median)
+            event_lst, uncorrected_pvals, dpsi_vals, discarded_dt = classical_test(cond1, cond2, paired, median, nan_th)
             corrected_pvals_dict = multiple_test_correction(event_lst, uncorrected_pvals, alpha)
 
         else:
