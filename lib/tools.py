@@ -100,7 +100,7 @@ class Parser(object):
                 raise FormatError(lineNumber, msg)
             return True
         except FormatError:
-            logger.error("%s, in line %i. Skipping line..." % (sys.exc_info()[1].args[0], lineNumber + 1))
+            logger.error("%s, in line %i. %s. Skipping line..." % (sys.exc_info()[1].args[0], lineNumber + 1, msg[0]))
             return False
         except BaseException:
             logger.error("Unknown error: %s" % sys.exc_info()[1].args[0])
@@ -142,7 +142,7 @@ class IoeParser(Parser):
                 raise FormatError(lineNumber, msg)
             return True
         except FormatError:
-            logger.error("%s, in line %i. Skipping line..." % (sys.exc_info()[1].args[0], lineNumber + 1))
+            logger.error("%s, in line %i. %s. Skipping line..." % (sys.exc_info()[1].args[0], lineNumber + 1, msg[0]))
             return False
         except BaseException:
             logger.error("Unknown error: %s" % sys.exc_info()[1].args[0])
@@ -170,7 +170,7 @@ class ExpressionParser(Parser):
             fields = line.rstrip('\n').split('\t')
             #Parsing the number of fields
             if len(fields) < self.MIN_FIELDS:
-                msg.append("Unexpeced number of fields. %i expected, %i given." % \
+                msg.append("Unexpeced number of fields. %i expected, %i given" % \
                     (self.MIN_FIELDS, len(fields)))
             else:
                 #Checking for empty or blank(\s) fields
@@ -189,7 +189,7 @@ class ExpressionParser(Parser):
                 raise FormatError(lineNumber, msg)
             return True
         except FormatError:
-            logger.error("%s, in line %i. Skipping line..." % (sys.exc_info()[1].args[0], lineNumber + 1))
+            logger.error("%s, in line %i. %s. Skipping line..." % (sys.exc_info()[1].args[0], lineNumber + 1, msg[0]))
             return False
         except BaseException:
             logger.error("Unknown error: %s" % sys.exc_info()[1].args[0])
@@ -228,7 +228,7 @@ class PsiParser(Parser):
                     raise FormatError(lineNumber, msg)
             return True
         except FormatError:
-            logger.error("%s, in line %i. Skipping line..." % (sys.exc_info()[1].args[0], lineNumber + 1))
+            logger.error("%s, in line %i. %s. Skipping line..." % (sys.exc_info()[1].args[0], lineNumber + 1, msg[0]))
             return False
         except BaseException:
             logger.error("Unknown error: %s" % sys.exc_info()[1].args[0])
@@ -267,7 +267,7 @@ class TpmParser(Parser):
                     raise FormatError(lineNumber, msg)
             return True
         except FormatError:
-            logger.error("%s, in line %i. Skipping line..." % (sys.exc_info()[1].args[0], lineNumber + 1))
+            logger.error("%s, in line %i. %s. Skipping line..." % (sys.exc_info()[1].args[0], lineNumber + 1, msg[0]))
             return False
         except BaseException:
             logger.error("Unknown error: %s" % sys.exc_info()[1].args[0])
@@ -533,3 +533,4 @@ class TpmWriter(Writer, TpmParser):
         for x in colIds:
             line.append(str(value[x]))
         return line
+
