@@ -538,17 +538,17 @@ List of options available:
 
 - **-l** | **--lower-bound**:  Lower-bound for the absolute delta PSI value to test for significance. Events with less than this delta PSI will not be tested. (Default: 0).
 
-- **-pa** | **--paired**: Boolean. Indicates if replicates across conditions are paired. (Default: False).
+- **-pa** | **--paired**: Indicates if replicates across conditions are paired.
 
-- **-gc** | **--gene-correction**: Boolean. If True, SUPPA correct the p-values by gene. (Default: False).
+- **-gc** | **--gene-correction**: Correction of the p-values by gene.
 
 - **-al** | **--alpha**: Family-wise error rate to use for the multiple test correction. (Default: 0.05).
 
--  **-s** | **--save_tpm_events**: Boolean. If True, the average log TPM of the events will be saved in an external file (Default: False).
+-  **-s** | **--save_tpm_events**: The average log TPM of the events will be saved in an external file.
 
--  **-c** | **--combination**: Boolean. If True, SUPPA perform the analysis between all the possible combinations of conditions (Default: False).
+-  **-c** | **--combination**: SUPPA will perform the analysis between all the possible combinations of conditions.
 
--  **-me** | **--median**: Boolean. If True, SUPPA use the median to calculate the Delta PSI. (Default: False).
+-  **-me** | **--median**: SUPPA will use the median to calculate the Delta PSI, instead of the mean.
 
 -  **-th** | **--tpm-threshold**: Minimum expression (calculated as average TPM value within-replicates and between-conditions) to be included in the analysis. (Default: 0).
 
@@ -561,22 +561,19 @@ List of options available:
 
 ### **Differential transcript usage** ###
 
-An example of the usage of the program with transcripts is:
+An example of the usage of the program with transcripts is, indicating that replicates are paired (-pa), to apply a multple testing correction (-gc) and perform pairwise comparison between all conditions (-c):
 
 ```
-python3.4 suppa.py diffSplice --method <empirical> --input <ioi-file> --psi <Cond1.psi> <Cond2.psi> --expression-file <Cond1_expression-file> <Cond2_expression-file> --area <1000> --lower-bound <0.05> -gc -o <output-file>
+python3.4 suppa.py diffSplice --method <empirical> --input <ioi-file> --psi <Cond1.psi> <Cond2.psi> --expression-file <Cond1_expression-file> <Cond2_expression-file> --area <1000> --lower-bound <0.05> -pa -gc -c -o <output-file>
 ```
 
 ### **Differential splicing with local events** ###
 
-An example of the usage of the program with local events is:
+An example of the usage of the program with local events, applying a multple testing correction (-gc):
 
 ```
 python3.4 suppa.py diffSplice --method <empirical> --input <ioe-file> --psi <Cond1.psi> <Cond2.psi> --expression-file <Cond1_expression-file> <Cond2_expression-file> --area <1000> --lower-bound <0.05> -gc -o <output-file>
 ```
-
-
-**Note:** ΔPSI values are calculated pairwise between each pair of adjacent conditions as provided, and calculating the PSI different between a given condition and the previous one. For instance, for three conditions 1,2,3, the ΔPSI values will be calculated for 3 - 2 and 2 - 1. 
 
 ### **Output files** ###
 
@@ -606,8 +603,8 @@ ENSG00000000419;A3:chr20:49557492-49558568:49557470-49558568:-	0.1307455855	0.04
 ENSG00000000419;SE:chr20:49557470-49557642:49557746-49558568:-	0.0469449126	0.0954045953
 ENSG00000000419;SE:chr20:49557470-49557666:49557746-49558568:-	0.0164051352	0.1518481518
 ```
-If **--combination** flag is set to FALSE, ΔPSI values are calculated pairwise between each pair of adjacent conditions as provided, and calculating the PSI different between a given condition and the previous one. For instance, for three conditions 1,2,3, the ΔPSI values will be calculated for 2 - 1 (Cond1_Cond2_dPSI) and 3 - 2 (Cond2_Cond3_dPSI). 
-By contrast, if  **--combination** flag is set to TRUE, ΔPSI values are calculated pairwise between all the possible combinations conditions. For the previous example conditions 1,2,3, the ΔPSI values will be calculated for 2 - 1 (Cond1_Cond2_dPSI), 3 - 1 (Cond1_Cond3_dPSI) and 3 - 2 (Cond2_Cond3_dPSI).
+If **--combination** flag is indicated, ΔPSI values are calculated pairwise between each pair of adjacent conditions as provided, and calculating the PSI different between a given condition and the previous one. For instance, for three conditions 1,2,3, the ΔPSI values will be calculated for 2 - 1 (Cond1_Cond2_dPSI) and 3 - 2 (Cond2_Cond3_dPSI). 
+By contrast, if  **--combination** flag is not indicated, ΔPSI values are calculated pairwise between all the possible combinations conditions. For the previous example conditions 1,2,3, the ΔPSI values will be calculated for 2 - 1 (Cond1_Cond2_dPSI), 3 - 1 (Cond1_Cond3_dPSI) and 3 - 2 (Cond2_Cond3_dPSI).
 
 
 **psivec file**
