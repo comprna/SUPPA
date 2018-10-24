@@ -7,15 +7,16 @@ library(ggrepel)
 # install.packages("ggrepel")
 
 
-#Load the dspi file
-dpsi <- read.table(file="/home/shinoda/Desktop/Master_class/TRA2_diffSplice.dpsi",sep="\t")
+#Load the dspi file (output from SUPPA diffSplice)
+dpsi <- read.table(file="~/TRA2_diffSplice.dpsi",sep="\t")
 colnames(dpsi) <- c("dPSI","p_value")
-psi_events <- read.table(file="/home/shinoda/Desktop/Master_class/events.psi",sep="\t")
+#Load the psi file (output from SUPPA generateEvents)
+psi_events <- read.table(file="~/TRA2_events.psi",sep="\t")
 colnames(psi_events) <- c("CTRL1","CTRL2","CTRL3","KD1","KD2","KD3")
 
 
-#Load the tpm of the events
-event_TPM <- read.table(file="/home/shinoda/Desktop/Master_class/TRA2_diffSplice_avglogtpm.tab",sep="\t",header = TRUE)
+#Load the tpm of the events (output from SUPPA diffSplice, activating flag --save_tpm_events)
+event_TPM <- read.table(file="~/TRA2_diffSplice_avglogtpm.tab",sep="\t",header = TRUE)
 colnames(event_TPM) <- c("event","mean_TPM")
 
 
@@ -39,7 +40,7 @@ label <- "ENSG00000149554"
 
 #Volcano plot
 
-jpeg(file = "/home/shinoda/Desktop/Master_class/volcano_TRA2.jpeg")
+jpeg(file = "~/volcano_TRA2.jpeg")
 
 p <- ggplot(final_table, aes(x=dPSI, y=log10pval, color=sig))
 p + geom_point() + geom_label_repel(aes(label=ifelse(Name=="ENSG00000149554;SE:chr11:125496728-125497502:125497725-125499127:+","CHEK1",''))) +
@@ -67,7 +68,7 @@ dev.off()
 
 
 #MA plot (filtering out genes with average logRNAc value below 0)
-jpeg(file = "/home/shinoda/Desktop/Master_class/MA_TRA2.jpeg")
+jpeg(file = "~/MA_TRA2.jpeg")
 
 p <- ggplot(final_table[final_table$logRNAc > 0,], aes(x=logRNAc, y=dPSI, color=sig))
 p + geom_point() + geom_label_repel(aes(label=ifelse(Name=="ENSG00000149554;SE:chr11:125496728-125497502:125497725-125499127:+","CHEK1",''))) +
