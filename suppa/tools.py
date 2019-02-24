@@ -9,7 +9,7 @@ Created on Thu Dec 19 16:27:06 2013
 import sys
 import logging
 from abc import ABCMeta, abstractmethod
-from lib.event import *
+from .event import *
 
 
 #Setting logging preferences

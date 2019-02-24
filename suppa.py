@@ -1,3 +1,4 @@
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Wed Aug 06 17:51:05 2014
@@ -6,12 +7,12 @@ Created on Wed Aug 06 17:51:05 2014
 @email: gael.perez[at]upf.edu
 """
 
-import fileMerger as joinFiles
-import psiPerGene as psiPerIsoform
-import psiCalculator as psiPerEvent
-import eventGenerator as generateEvents
-import eventClusterer as clusterAnalysis
-import significanceCalculator as diffSplice
+import suppa.fileMerger as joinFiles
+import suppa.psiPerGene as psiPerIsoform
+import suppa.psiCalculator as psiPerEvent
+import suppa.eventGenerator as generateEvents
+import suppa.eventClusterer as clusterAnalysis
+import suppa.significanceCalculator as diffSplice
 import logging
 import argparse 
 import sys

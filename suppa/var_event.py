@@ -1,5 +1,5 @@
 import itertools
-from lib.event import Event
+from .event import Event
 
 
 class VariableEvent(Event):

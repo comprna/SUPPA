@@ -9,7 +9,7 @@ Created on Wed May 25 04:20:00 CEST 2016
 
 import os
 import logging
-from lib.cluster_tools import cluster_analysis
+from .cluster_tools import cluster_analysis
 from argparse import ArgumentParser, RawTextHelpFormatter
 
 

@@ -10,7 +10,7 @@ import sys
 import logging
 import numpy as np
 from argparse import ArgumentParser, RawTextHelpFormatter
-from lib.tools import *
+from .tools import *
 
 
 description = \

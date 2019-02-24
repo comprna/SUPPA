@@ -607,7 +607,7 @@ def process_events(my_gene, event, ioe_writer, gtf_writer, edge_len, th):
         gtf_writer.write(gtf_line, etype)
 
 # to avoid circular dependencies
-from lib.var_event import *
+from .var_event import *
 
 
 def create_event_classes(all_events, b_type):
