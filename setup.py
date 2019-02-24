@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 setup(
     name='SUPPA',
     packages=find_packages(),
-    scripts=['suppa2.py'],
+    scripts=['suppa2.py', 'multipleFieldSelection.py', 'scripts/format_Ensembl_ids.R'],
     version='2.3',
     description='A tool to study splicing across multiple conditions at high speed and accuracy.',
     author='GP Alamancos',
