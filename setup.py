@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 setup(
     name='SUPPA',
     packages=find_packages(),
-    scripts=['suppa2'],
+    scripts=['suppa_run.py'],
     version='2.3',
     description='A tool to study splicing across multiple conditions at high speed and accuracy.',
     author='GP Alamancos',
