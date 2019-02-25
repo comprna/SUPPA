@@ -7,6 +7,10 @@
 #[4] Fourth argument: output file of the first condition
 #[5] Fifth argument: output file of the second condition
 
+## bug in setuptools, this script is recognized as python if not included
+## bugs #355, #1178
+data.frame(a="")$a
+
 # Parse command line arguments
 print("Parsing samples...")
 CHARACTER_command_args <- commandArgs(trailingOnly=TRUE)
