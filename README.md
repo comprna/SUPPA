@@ -72,10 +72,34 @@ SUPPA has been developed in Python 3.4.
 
 If necessary, to install python3 we recommend to download from the official site https://www.python.org/downloads/ the corresponding version for your OS.
 
+## From the tar.gz archive
+
+Uncompress the archive using:
+```
+tar xvzf SUPPA-2.3.tar.gz
+cd SUPPA
+```
+
+As root/administrator, you can install with:
+```
+python3 setup.py install
+```
+or as a non-privilegied user for a user specific install:
+```
+python3 setup.py install --user
+```
+in this case, on a unix-like environment, the executable are installed by default in `~/.local/bin`. You can add this path to the shell search path with (Bash shell):
+
+```
+if ! grep -q 'PATH.*~/\.local/bin' ~/.bashrc ; then echo 'export PATH=$PATH:~/.local/bin' >>~/.bashrc; fi
+```
+
+## Using pip
+
 A installation using pip is available using the next command:
 
 ```
-pip install SUPPA==2.2.1 
+pip install SUPPA==2.3 
 ```
 By default SUPPA is installed into the Python package library directory. The following command can be executed to obtain the directory location:
 
@@ -84,6 +108,8 @@ pip show SUPPA
 ```
 
 SUPPA is ready to use. Once downloaded, it can be used directly from the command line by specifying the absolute path to the SUPPA executable (suppa.py).
+
+## Using bioconda
 
 Another option is via bioconda (thanks to Devon Ryan)
 
@@ -98,7 +124,7 @@ conda install -c bioconda suppa
 SUPPA works with a command/subcommand structure:
 
 ```
-python3.4 suppa.py subcommand options
+python3 suppa2.py subcommand options
 
 ```
 where the subcommand can be one of these five:
@@ -165,7 +191,7 @@ The *generateEvents* operation uses the lines where the feature (column 3) is "e
 To generate the events from the GTF file one has to run the following command:
 
 ```
-python3.4 suppa.py generateEvents [options]
+python3 suppa2.py generateEvents [options]
 ```
 List of options available:
 
@@ -202,13 +228,13 @@ List of options available:
 The command line to generate local AS events will be of the form:
 
 ```
-python3.4 suppa.py generateEvents -i <input-file.gtf> -o <output-file> -f ioe -e <list-of-events>
+python3 suppa2.py generateEvents -i <input-file.gtf> -o <output-file> -f ioe -e <list-of-events>
 ```
 
 The command to generate the transcript "events" would be of the form:
 
 ```
-python3.4 suppa.py generateEvents -i <input-file.gtf> -o <output-file> -f ioi 
+python3 suppa2.py generateEvents -i <input-file.gtf> -o <output-file> -f ioi 
 ```
 
 ## Output files
@@ -402,7 +428,7 @@ python3.4 suppa.py psiPerIsoform -g <gtf-file> -e <expression-file> -o <output-f
 To calculate the PSI value for each event from the *ioe* and the *transcript expression file* one has to run the following command:
 
 ```
-python3.4 suppa.py psiPerEvent [options]
+python3 suppa2.py psiPerEvent [options]
 
 ```
 List of options available:
@@ -422,7 +448,7 @@ List of options available:
 An example of the usage of the program is:
 
 ```
-python3.4 suppa.py psiPerEvent --ioe-file <ioe-file> --expression-file <expression-file> -o <output-file> 
+python3 suppa2.py psiPerEvent --ioe-file <ioe-file> --expression-file <expression-file> -o <output-file> 
 ```
 
 ### **Output files** ###
@@ -456,7 +482,7 @@ ENSG00000000419.12;SE:chr20:50940933-50941105:50941209-50942031:-       0.023022
 Transcript expression files used with SUPPA typically come from calculations with multiple samples. To facilitate the generation of a single file with all the transcript expression values for all samples, SUPPA distribution includes a program to combine multiple simple transcript expression files into one single file:
 
 ```
-python3.4 suppa.py joinFiles [options]
+python3 suppa2.py joinFiles [options]
 ```
 
 
@@ -564,7 +590,7 @@ List of options available:
 An example of the usage of the program with transcripts is, indicating that replicates are paired (-pa), to apply a multple testing correction (-gc) and perform pairwise comparison between all conditions (-c):
 
 ```
-python3.4 suppa.py diffSplice --method <empirical> --input <ioi-file> --psi <Cond1.psi> <Cond2.psi> --expression-file <Cond1_expression-file> <Cond2_expression-file> --area <1000> --lower-bound <0.05> -pa -gc -c -o <output-file>
+python3 suppa2.py diffSplice --method <empirical> --input <ioi-file> --psi <Cond1.psi> <Cond2.psi> --expression-file <Cond1_expression-file> <Cond2_expression-file> --area <1000> --lower-bound <0.05> -pa -gc -c -o <output-file>
 ```
 
 ### **Differential splicing with local events** ###
@@ -572,7 +598,7 @@ python3.4 suppa.py diffSplice --method <empirical> --input <ioi-file> --psi <Con
 An example of the usage of the program with local events, applying a multple testing correction (-gc):
 
 ```
-python3.4 suppa.py diffSplice --method <empirical> --input <ioe-file> --psi <Cond1.psi> <Cond2.psi> --expression-file <Cond1_expression-file> <Cond2_expression-file> --area <1000> --lower-bound <0.05> -gc -o <output-file>
+python3 suppa2.py diffSplice --method <empirical> --input <ioe-file> --psi <Cond1.psi> <Cond2.psi> --expression-file <Cond1_expression-file> <Cond2_expression-file> --area <1000> --lower-bound <0.05> -gc -o <output-file>
 ```
 
 ### **Output files** ###
@@ -661,7 +687,7 @@ event3    <psi_value> <psi_value> <psi_value> <psi_value> <psi_value> <psi_value
 SUPPA will use the psivec file to cluster events according to the PSI values across samples using those events that show significant change in at least one pairwise comparison using the dpsi file. Two methods are available: DBSCAN and OPTICS. Both methods require as input the minimum number of events in a cluster. OPTICS also requires as the maximum reachability distance (s), which represents the maximum distance in PSI space of an event to a cluster  To perform the clustering from the *dpsi* and the *psivec* one has to run the following command:
 
 ```
-python3.4 suppa.py clusterEvents [options]
+python3 suppa2.py clusterEvents [options]
 
 ```
 List of options available:

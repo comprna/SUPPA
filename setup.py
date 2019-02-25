@@ -1,11 +1,17 @@
-#!/usr/bin/env python3
+#! /usr/bin/env python3
 
 from setuptools import setup, find_packages
 
 setup(
     name='SUPPA',
     packages=find_packages(),
-    scripts=['suppa2.py', 'multipleFieldSelection.py', 'scripts/format_Ensembl_ids.R'],
+    scripts=['suppa2.py',
+             'scripts/suppa2_multipleFieldSelection.py',
+             'scripts/suppa2_format_Ensembl_ids.R',
+             'scripts/suppa2_split_file.R',
+             'scripts/suppa2_Volcano_MA_plot.R',
+             'scripts/suppa2_generate_boxplot_event.py',
+             'scripts/suppa2_format_unique_fasta_RefSeq_annotation.py'],
     version='2.3',
     description='A tool to study splicing across multiple conditions at high speed and accuracy.',
     author='GP Alamancos',

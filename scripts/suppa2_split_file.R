@@ -1,4 +1,4 @@
-#!/soft/R/R-3.1.0/bin/Rscript
+#! /usr/bin/env Rscript
 #Given two pairs of lists of samples, split [1] in two files with the samples indicated in [2] and [3]
 
 #[1] First argument: input file that we want to split
