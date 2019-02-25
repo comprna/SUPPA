@@ -17,7 +17,7 @@ CHARACTER_command_args <- commandArgs(trailingOnly=TRUE)
 
 #Load the input file
 print(paste0("Loading ",CHARACTER_command_args[1],"..."))
-input_file <- read.table(CHARACTER_command_args[1],header=TRUE)
+input_file <- read.table(CHARACTER_command_args[1],header=TRUE, check.names=FALSE)
 
 #Load the list of samples of the first condition
 first_condition <- unlist(strsplit(CHARACTER_command_args[2],","))
