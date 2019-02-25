@@ -403,7 +403,7 @@ transcript3 <expression>  <expression>  <expression>  <expression>
 At the moment the PSI per transcript isoform is calculated in the following way:
 
 ```
-python3.4 suppa.py psiPerIsoform [options]
+python3 suppa2.py psiPerIsoform [options]
 ```
 List of options available:
 
@@ -420,7 +420,7 @@ List of options available:
 An example of the usage of the program is:
 
 ```
-python3.4 suppa.py psiPerIsoform -g <gtf-file> -e <expression-file> -o <output-file>
+python3 suppa2.py psiPerIsoform -g <gtf-file> -e <expression-file> -o <output-file>
 ```
 
 ### **PSI per local event** ###
@@ -500,7 +500,7 @@ where the options are:
 We show below an example of the usage of the program for reading multiple output files from Sailfish to join together the 3rd column, given that all files have in the first column the transcript ids (which are kept for the output):
 
 ```
-python3.4 suppa.py joinFiles -f tpm -i sample1.tpm sample2.tpm sample3.tpm -o all_samples_tpms  
+python3 suppa2.py joinFiles -f tpm -i sample1.tpm sample2.tpm sample3.tpm -o all_samples_tpms  
 ```
 
 The output will look like an expression file with multiple files as described above.
@@ -547,7 +547,7 @@ where the expression values are given in TPM units.
 ### **Command and options** ###
 To calculate the dpsi from the *ioe*, *psi* and the *expression file* one has to run the following command:
 ```
-python3.4 suppa.py diffSplice [options]
+python3 suppa2.py diffSplice [options]
 ```
 
 List of options available:
@@ -719,7 +719,7 @@ List of options available:
 An example of the usage of the program is:
 
 ```
-python3.4 suppa.py clusterEvents --dpsi <dpsi-file> --psivec <psivec-file> --sig-threshold <0.05> --eps <0.05> --min-pts <20> --groups <1-3,4-6> -o <output-file> 
+python3 suppa2.py clusterEvents --dpsi <dpsi-file> --psivec <psivec-file> --sig-threshold <0.05> --eps <0.05> --min-pts <20> --groups <1-3,4-6> -o <output-file> 
 
 ```
 
