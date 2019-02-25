@@ -11,6 +11,9 @@ Read our [short SUPPA tutorial on an example dataset](https://github.com/comprna
 
    * [Overview](#overview)
    * [Installation](#installation)
+     * [From the tar.gz archive](#from-the-tar-gz-archive)
+     * [Using pip](#using-pip)
+     * [Using bioconda](#using-bioconda)
    * [Command and subcommand structure](#command-and-subcommand-structure)
    * [Generation of transcript events and local alternative splicing events](#generation-of-transcript-events-and-local-alternative-splicing-events)
       * [Input files](#input-files)
