@@ -11,7 +11,7 @@ Read our [short SUPPA tutorial on an example dataset](https://github.com/comprna
 
    * [Overview](#overview)
    * [Installation](#installation)
-     * [From the tar.gz archive](#from-the-tar-gz-archive)
+     * [From the tar.gz archive](#from-the-targz-archive)
      * [Using pip](#using-pip)
      * [Using bioconda](#using-bioconda)
    * [Command and subcommand structure](#command-and-subcommand-structure)
