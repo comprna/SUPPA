@@ -158,7 +158,7 @@ def main():
                 writer = Writer.getWriter("PSI")
                 logger.info("Generating output %s" % (output_file + ".psi"))
                 writer.openFile(output_file)
-                writer.writeLine("\t".join(col_ids), False)
+                writer.writeLine("\t".join(["Name"] + col_ids), False)
                 for key, value in sorted(psi_dictionary.items()):
                     logger.debug("Calculating psi for %s" % key)
                     psi_line = PsiWriter.lineGenerator(key, value, col_ids)

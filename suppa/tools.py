@@ -376,9 +376,9 @@ class ExpressionReader(Reader, ExpressionParser):
                 fields = line.rstrip("\n").split("\t")
                 if lineNumber == 0 and header: #Skip the header line
                     #Calculating the number of fields required
-                    min_fields = (len(line.rstrip("\n").split("\t")) + 1)
+                    min_fields = len(fields)
                     #Storing column_id for the expression fields
-                    colIds = fields
+                    colIds = fields[1:]
                     continue
                 if line.startswith('#'):
                     logger.debug("Line %i starts with #. Skipping line..." % (
