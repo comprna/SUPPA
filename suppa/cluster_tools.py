@@ -13,7 +13,7 @@ from itertools import islice
 from sklearn.cluster import DBSCAN
 from collections import defaultdict
 from sklearn.metrics import silhouette_score
-from lib.optics import *
+from .optics import *
 
 
 

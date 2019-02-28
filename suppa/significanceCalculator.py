@@ -12,7 +12,7 @@ Modified by Juan L. Trincado
 
 import os
 import logging
-from lib.diff_tools import multiple_conditions_analysis
+from .diff_tools import multiple_conditions_analysis
 from argparse import *
 
 

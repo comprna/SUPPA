@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 # The next script will format a phenotype table (junctions, events, trasncripts...)
 # for runnning FastQTL analysis
 

@@ -9,9 +9,9 @@ Created on Mon Feb 10 14:57:05 2014
 import sys
 import logging
 from argparse import ArgumentParser, RawTextHelpFormatter
-from lib.tools import *
-from lib.gtf_store import *
-from lib.event import *
+from .tools import *
+from .gtf_store import *
+from .event import *
 
 # Setting argument parser
 # parser = argparse.ArgumentParser()

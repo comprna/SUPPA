@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 """
 @authors: Juan L. Trincado
 @email: juanluis.trincado@upf.edu

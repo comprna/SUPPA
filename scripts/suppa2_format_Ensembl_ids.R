@@ -1,4 +1,5 @@
-#!/usr/bin/Rscript
+#! /usr/bin/env Rscript
+
 #with this script, running from bash, we want to format the ids fo the Ensembl transcripts for running SUPPA
 
 # Parse command line arguments

@@ -10,8 +10,8 @@ Created on Fri May 23 10:17:33 2014
 import sys
 import logging
 from argparse import ArgumentParser, RawTextHelpFormatter
-from lib.tools import *
-from lib.gtf_store import *
+from .tools import *
+from .gtf_store import *
 
 
 description = \
