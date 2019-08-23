@@ -75,7 +75,7 @@ If necessary, to install python3 we recommend to download from the official site
 A installation using pip is available using the next command:
 
 ```
-pip install SUPPA==2.2.1 
+pip install SUPPA==2.3 
 ```
 By default SUPPA is installed into the Python package library directory. The following command can be executed to obtain the directory location:
 
