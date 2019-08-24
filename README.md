@@ -1,6 +1,8 @@
 # SUPPA2
 
-Fast, accurate, and uncertainty-aware differential splicing analysis across multiple conditions https://www.ncbi.nlm.nih.gov/pubmed/29571299
+Fast, accurate, and uncertainty-aware differential splicing analysis across multiple conditions 
+https://www.ncbi.nlm.nih.gov/pubmed/29571299
+https://www.ncbi.nlm.nih.gov/pubmed/26179515
 
 Here we provide an extensive explanation about how SUPPA works and all the running options.
 Read our [short SUPPA tutorial on an example dataset](https://github.com/comprna/SUPPA/wiki).
@@ -90,6 +92,9 @@ Another option is via bioconda (thanks to Devon Ryan)
 ```
 conda install -c bioconda suppa
 ```
+
+Alternatively, you can obtain the code for the SUPPA2.3 release here:
+https://github.com/comprna/SUPPA/releases/tag/v2.3
 
 ----------------------------
 # Command and subcommand structure
