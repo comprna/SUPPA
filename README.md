@@ -569,7 +569,7 @@ List of options available:
 An example of the usage of the program with transcripts is, indicating that replicates are paired (-pa), to apply a multple testing correction (-gc) and perform pairwise comparison between all conditions (-c):
 
 ```
-python3.4 suppa.py diffSplice --method <empirical> --input <ioi-file> --psi <Cond1.psi> <Cond2.psi> --expression-file <Cond1_expression-file> <Cond2_expression-file> --area <1000> --lower-bound <0.05> -pa -gc -c -o <output-file>
+python3.4 suppa.py diffSplice --method <empirical> --input <ioi-file> --psi <Cond1.psi> <Cond2.psi> --tpm <Cond1_expression-file> <Cond2_expression-file> --area <1000> --lower-bound <0.05> -pa -gc -c -o <output-file>
 ```
 
 ### **Differential splicing with local events** ###
@@ -577,7 +577,7 @@ python3.4 suppa.py diffSplice --method <empirical> --input <ioi-file> --psi <Con
 An example of the usage of the program with local events, applying a multple testing correction (-gc):
 
 ```
-python3.4 suppa.py diffSplice --method <empirical> --input <ioe-file> --psi <Cond1.psi> <Cond2.psi> --expression-file <Cond1_expression-file> <Cond2_expression-file> --area <1000> --lower-bound <0.05> -gc -o <output-file>
+python3.4 suppa.py diffSplice --method <empirical> --input <ioe-file> --psi <Cond1.psi> <Cond2.psi> --tpm <Cond1_expression-file> <Cond2_expression-file> --area <1000> --lower-bound <0.05> -gc -o <output-file>
 ```
 
 ### **Output files** ###
