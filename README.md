@@ -557,7 +557,7 @@ List of options available:
 
 -  **-th** | **--tpm-threshold**: Minimum expression (calculated as average TPM value within-replicates and between-conditions) to be included in the analysis. (Default: 0).
 
--  **-nan** | **--nan-threshold**: Percentage allowed of samples per condition with nan values for returning a DeltaPSI (Default: 0, no missing values allowed).
+-  **-nan** | **--nan-threshold**: Proportion of samples with nan values allowed per condition to calculate a DeltaPSI (Default: 0, i.e. no missing values allowed).
 
 - **-o** | **--output**: Name of the output
 
