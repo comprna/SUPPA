@@ -117,7 +117,7 @@ parser.add_argument('-th', '--tpm-threshold',
 
 def nan_threshold_type(x):
     x = float(x)
-    if x < 0.0 and x > 1.0:
+    if x < 0.0 or x > 1.0:
         raise ArgumentTypeError("nan_threshold should be a float number between 0 and 1")
     return x
 
