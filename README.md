@@ -679,7 +679,9 @@ List of options available:
 
 - **-dt** | **--dpsi-threshold**: Lower-bound for the absolute delta PSI value to cluster. (Default: 0.05)
 
-- **-e** | **--eps**: Maximum (Euclidean) distance (between 0 and 1) to consider two events as members of the same cluster. (Default: 0.05).
+- **-e** | **--eps**: Maximum distance (between 0 and 1) to consider two events as members of the same cluster. (Default: 0.05).
+
+- **-m** | **--metric**: distance metric. Choices: euclidean, manhattan, cosine. (Default: euclidean).
 
 - **-s** | **--separation**: maximum distance in PSI space of an event to a cluster. Required for OPTICS method
 
