@@ -1,8 +1,9 @@
 # SUPPA2
 
 Fast, accurate, and uncertainty-aware differential splicing analysis across multiple conditions. Publications:
-* https://www.ncbi.nlm.nih.gov/pubmed/29571299
-* https://www.ncbi.nlm.nih.gov/pubmed/26179515
+
+* Trincado JL, Entizne JC, Hysenaj G, Singh B, Skalic M, Elliott DJ, Eyras E. [SUPPA2: fast, accurate, and uncertainty-aware differential splicing analysis across multiple conditions](https://www.ncbi.nlm.nih.gov/pubmed/29571299). Genome Biol. 2018 Mar 23;19(1):40.
+* Alamancos GP, Pagès A, Trincado JL, Bellora N, Eyras E. [Leveraging transcript quantification for fast computation of alternative splicing profiles](https://www.ncbi.nlm.nih.gov/pubmed/26179515). RNA. 2015 Sep;21(9):1521-31.
 
 Here we provide an extensive explanation about how SUPPA works and all the running options.
 Read our [short SUPPA tutorial on an example dataset](https://github.com/comprna/SUPPA/wiki).
