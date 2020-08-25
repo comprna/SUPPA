@@ -103,8 +103,7 @@ https://github.com/comprna/SUPPA/releases/tag/v2.3
 SUPPA works with a command/subcommand structure:
 
 ```
-python3.4 suppa.py subcommand options
-
+suppa.py subcommand options
 ```
 where the subcommand can be one of these five:
 
