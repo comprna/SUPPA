@@ -113,6 +113,12 @@ where the subcommand can be one of these five:
 - **diffSplice**        : Calculate differential splicing across multiple conditions with replicates.
 - **clusterEvents**     : Cluster events according to PSI values across conditions.
 
+
+Note: Unless suppa was installed using a dependency manager (i.e. suppa would just be in the PATH), you can run suppa as:
+```
+python3.4 suppa.py subcommand options
+```
+
 ----------------------------
 **Generation of transcript events and local alternative splicing events**
 ==============
