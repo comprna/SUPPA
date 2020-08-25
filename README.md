@@ -608,8 +608,8 @@ ENSG00000000419;A3:chr20:49557492-49558568:49557470-49558568:-	0.1307455855	0.04
 ENSG00000000419;SE:chr20:49557470-49557642:49557746-49558568:-	0.0469449126	0.0954045953
 ENSG00000000419;SE:chr20:49557470-49557666:49557746-49558568:-	0.0164051352	0.1518481518
 ```
-If **--combination** flag is indicated, ΔPSI values are calculated pairwise between each pair of adjacent conditions as provided, and calculating the PSI different between a given condition and the previous one. For instance, for three conditions 1,2,3, the ΔPSI values will be calculated for 2 - 1 (Cond1_Cond2_dPSI) and 3 - 2 (Cond2_Cond3_dPSI). 
-By contrast, if  **--combination** flag is not indicated, ΔPSI values are calculated pairwise between all the possible combinations conditions. For the previous example conditions 1,2,3, the ΔPSI values will be calculated for 2 - 1 (Cond1_Cond2_dPSI), 3 - 1 (Cond1_Cond3_dPSI) and 3 - 2 (Cond2_Cond3_dPSI).
+By default, SUPPA calculates ΔPSI values pairwise between each pair of adjacent conditions as provided, and calculating the PSI difference between a given condition and the previous one. For instance, for three conditions 1,2,3, the ΔPSI values will be calculated for 2 - 1 (Cond1_Cond2_dPSI) and 3 - 2 (Cond2_Cond3_dPSI). 
+On the other hand, if  the **--combination** flag is indicated, ΔPSI values are calculated pairwise between all the possible combinations of conditions. For the previous example with conditions provided as 1,2,3, the ΔPSI values will then be calculated for 2 - 1 (Cond1_Cond2_dPSI), 3 - 1 (Cond1_Cond3_dPSI) and 3 - 2 (Cond2_Cond3_dPSI).
 
 
 **psivec file**
