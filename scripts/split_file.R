@@ -16,7 +16,7 @@ print(paste0("Loading ",CHARACTER_command_args[1],"..."))
 input_file <- read.table(CHARACTER_command_args[1],header=TRUE)
 
 #Load the list of samples of the first condition
-#Replace the stripes by dots
+#Replace the dashes with dots
 formatted_string1 <- gsub("-",".",CHARACTER_command_args[2])
 first_condition <- unlist(strsplit(formatted_string1,","))
 
@@ -25,7 +25,7 @@ stopifnot(first_condition %in% colnames(input_file))
 first_output <- input_file[first_condition]
 
 #Load the list of samples of the second condition
-#Replace the stripes by dots
+#Replace the dashes with dots
 formatted_string2 <- gsub("-",".",CHARACTER_command_args[3])
 second_condition <- unlist(strsplit(formatted_string2,","))
 
