@@ -77,7 +77,7 @@ class Parser(object):
             fields = line.rstrip('\n').split('\t')
             #Parsing the number of fields
             if len(fields) < self.MIN_FIELDS:
-                msg.append("Unexpeced number of fields.")
+                msg.append("Unexpected number of fields.")
             else:
                 #Checking for empty or blank(\s) fields
                 for empty in (i for i in range(self.MIN_FIELDS) if not \
@@ -125,7 +125,7 @@ class IoeParser(Parser):
             fields = line.rstrip('\n').split('\t')
             #Parsing the number of fields
             if len(fields) < self.MIN_FIELDS:
-                msg.append("Unexpeced number of fields.")
+                msg.append("Unexpected number of fields.")
             else:
                 #Checking for empty or blank(\s) fields
                 for empty in (i for i in range(self.MIN_FIELDS) if not \
@@ -170,7 +170,7 @@ class ExpressionParser(Parser):
             fields = line.rstrip('\n').split('\t')
             #Parsing the number of fields
             if len(fields) < self.MIN_FIELDS:
-                msg.append("Unexpeced number of fields. %i expected, %i given" % \
+                msg.append("Unexpected number of fields. %i expected, %i given" % \
                     (self.MIN_FIELDS, len(fields)))
             else:
                 #Checking for empty or blank(\s) fields
@@ -209,7 +209,7 @@ class PsiParser(Parser):
             fields = line.rstrip('\n').split('\t')
             #Parsing the number of fields
             if len(fields) < self.MIN_FIELDS:
-                msg.append("Unexpeced number of fields.")
+                msg.append("Unexpected number of fields.")
             else:
                 #Checking for empty or blank(\s) fields
                 for empty in (i for i in range(self.MIN_FIELDS) if not \
@@ -248,7 +248,7 @@ class TpmParser(Parser):
             fields = line.rstrip('\n').split('\t')
             # Parsing the number of fields
             if len(fields) < self.MIN_FIELDS:
-                msg.append("Unexpeced number of fields.")
+                msg.append("Unexpected number of fields.")
             else:
                 # Checking for empty or blank(\s) fields
                 for empty in (i for i in range(self.MIN_FIELDS) if not \
