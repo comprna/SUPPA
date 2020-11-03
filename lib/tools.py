@@ -189,6 +189,7 @@ class ExpressionParser(Parser):
                 raise FormatError(lineNumber, msg)
             return True
         except FormatError:
+            logger.error(msg)
             logger.error("%s, in line %i. %s. Skipping line..." % (sys.exc_info()[1].args[0], lineNumber + 1, msg[0]))
             return False
         except BaseException:
