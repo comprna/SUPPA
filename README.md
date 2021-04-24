@@ -203,7 +203,7 @@ List of options available:
         - Boundary type (only used for local AS events). Options: S -- Strict (Default) V -- Variable
 
 - **-t** | **--threshold**: THRESHOLD
-        - Variability treshold (Default: 10nt. Only used forlocal AS events). In case of strict boundaries this argument is ignored
+        - Variability treshold (Default: 10nt. Only used for local AS events). In case of strict boundaries this argument is ignored
 
 - **-l**  | **--exon-length**: (only used for local AS events). Defines the number of nucleotides to display in the output GTF. (Default: 100 nt)
 
