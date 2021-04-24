@@ -361,7 +361,9 @@ SUPPA reads the ioi or ioe file generated in the previous step and a transcript 
 
 ## Input files
 
-An **ioi/ioe** file and a "**transcript expression file**" are required as input. 
+To calculate the PSI for local events, the required input files are an **ioe** file and a **transcript expression file**.
+
+However, to calculate the PSI per isoform, the required input files are an **GTF** file and a **transcript expression file**.
 
 The transcript expression file is a tab separated file where each line provides the estimated abundance of each transcript (in TPM units). This file might contain multiple columns with the expression values in different samples. The expression file must have a header with the naming of the different expression fields, i.e., the sample name of each expression value. 
 
