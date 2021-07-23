@@ -395,7 +395,6 @@ def calculate_events_pvals(between_conditions_distribution,
             uncorrected_pvals.append(event_pval)
             event_lst.append(event)
 
-    progressbar("Calculating events empirical p-value:", i+1, lst_len)
     print("\nDone!\n")
 
     return event_lst, uncorrected_pvals
