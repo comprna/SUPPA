@@ -74,7 +74,8 @@ def get_psi_values(dict1, dict2):
     return psi_values
 
 def get_proportion_nans(psi_list):
-
+    if(len(psi_list))==0:
+        return 1.00
     count = 0
     for x in psi_list:
         if(math.isnan(x)):
