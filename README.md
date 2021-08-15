@@ -574,10 +574,10 @@ List of options available:
 
 ### **Differential transcript usage** ###
 
-An example of the usage of the program with transcripts is, indicating that replicates are paired (-pa), to apply a multple testing correction (-gc) and perform pairwise comparison between all conditions (-c):
+An example of the usage of the program with transcripts is, indicating that replicates are paired (-pa), to apply a multple testing correction (-gc):
 
 ```
-python3.4 suppa.py diffSplice --method <empirical> --input <ioi-file> --psi <Cond1.psi> <Cond2.psi> --tpm <Cond1_expression-file> <Cond2_expression-file> --area <1000> --lower-bound <0.05> -pa -gc -c -o <output-file>
+python3.4 suppa.py diffSplice --method <empirical> --input <ioi-file> --psi <Cond1.psi> <Cond2.psi> --tpm <Cond1_expression-file> <Cond2_expression-file> --area <1000> --lower-bound <0.05> -pa -gc -o <output-file>
 ```
 
 ### **Differential splicing with local events** ###
