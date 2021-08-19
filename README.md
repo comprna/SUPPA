@@ -529,7 +529,7 @@ where the expression values are given in TPM units.
 
 **Note:** these files have a header with only the sample names (1 less column)
 
-**Important:** SUPPA will read one PSI file and one transcript expression file per condition. Each of these files will contain the multiple replicates (or individual samples) that are grouped into a given condition, and the should be specified in the same order within the files.
+**Important:** SUPPA will read one PSI file and one transcript expression file per condition. Each of these files will contain the multiple replicates (or individual samples) that are grouped into a given condition, and should be specified in the same order within the files. Additionally, you should have the same IDs in both conditions. 
 
 ### **Command and options** ###
 To calculate the dpsi from the *ioe*, *psi* and the *expression file* one has to run the following command:
