@@ -46,6 +46,7 @@ class Event:
         self.alt_search = {}
         self.positive_ids = {}
         self.negative_ids = {}
+        self._event_count = 0
         self.etype = ''
         self.gtf_string = ('{}\t{}\texon\t{{}}\t{{}}\t.\t{{}}\t.\tgene_id "{{}}"; transcript_id "{{}}:{{}}";\n'
                            .format(self.gene.chr, Event.file))
@@ -74,6 +75,11 @@ class Event:
 
     def add_real_events(self, *_):
         pass
+
+    @property
+    def event_count(self):
+        self._event_count += 1
+        return self._event_count
 
 
 class ARSS(Event):
@@ -112,7 +118,10 @@ class ARSS(Event):
         gene = self.gene
         for neg1, neg2 in self.negative_coords:
             if neg2 == coord3 and (coord1 < neg1 < coord2):
-                eventid = '{}:{}-{}:{}-{}:{}'.format(gene.chr, coord2, coord3, neg1, neg2, gene.strand)
+                eventid = 'e{}:{}:{}-{}:{}-{}:{}'.format(
+                    self.event_count, gene.chr, coord2, coord3, neg1, neg2, gene.strand
+                )
+                self.event_count
                 self.positive_ids[eventid] = self.positive_ids.get(eventid, []) + [transcript]
                 self.negative_ids[eventid] = self.negative_coords[(neg1, neg2)]
 
@@ -125,19 +134,19 @@ class ARSS(Event):
             full_event = '{}:{}'.format(self.etype, event)
             e_vals = full_event.replace('-', ':').split(':')
 
-            line1 = self.gtf_string.format(int(e_vals[4]) - edge, e_vals[2], strand, full_event, full_event,
+            line1 = self.gtf_string.format(int(e_vals[5]) - edge, e_vals[3], strand, full_event, full_event,
                                            'alternative1')
             yield line1, self.etype
 
-            line2 = self.gtf_string.format(e_vals[3], int(e_vals[3]) + edge, strand, full_event, full_event,
+            line2 = self.gtf_string.format(e_vals[4], int(e_vals[4]) + edge, strand, full_event, full_event,
                                            'alternative1')
             yield line2, self.etype
 
-            line3 = self.gtf_string.format(int(e_vals[4]) - edge, e_vals[4], strand, full_event, full_event,
+            line3 = self.gtf_string.format(int(e_vals[5]) - edge, e_vals[5], strand, full_event, full_event,
                                            'alternative2')
             yield line3, self.etype
 
-            line4 = self.gtf_string.format(e_vals[5], int(e_vals[5]) + edge, strand, full_event, full_event,
+            line4 = self.gtf_string.format(e_vals[6], int(e_vals[6]) + edge, strand, full_event, full_event,
                                            'alternative2')
             yield line4, self.etype
 
@@ -178,7 +187,9 @@ class ALSS(Event):
         gene = self.gene
         for neg1, neg2 in self.negative_coords:
             if neg1 == coord1 and (coord2 < neg2 < coord3):
-                eventid = '{}:{}-{}:{}-{}:{}'.format(gene.chr, coord1, coord2, neg1, neg2, gene.strand)
+                eventid = 'e{}:{}:{}-{}:{}-{}:{}'.format(
+                    self.event_count, gene.chr, coord1, coord2, neg1, neg2, gene.strand
+                )
                 self.positive_ids[eventid] = self.positive_ids.get(eventid, []) + [transcript]
                 self.negative_ids[eventid] = self.negative_coords[(neg1, neg2)]
 
@@ -191,19 +202,19 @@ class ALSS(Event):
             full_event = '{}:{}'.format(self.etype, event)
             e_vals = full_event.replace('-', ':').split(':')
 
-            line1 = self.gtf_string.format(int(e_vals[2]) - edge, e_vals[2], strand, full_event, full_event,
+            line1 = self.gtf_string.format(int(e_vals[3]) - edge, e_vals[3], strand, full_event, full_event,
                                            'alternative1')
             yield line1, self.etype
 
-            line2 = self.gtf_string.format(e_vals[3], int(e_vals[5]) + edge, strand, full_event, full_event,
+            line2 = self.gtf_string.format(e_vals[4], int(e_vals[6]) + edge, strand, full_event, full_event,
                                            'alternative1')
             yield line2, self.etype
 
-            line3 = self.gtf_string.format(int(e_vals[2]) - edge, e_vals[2], strand, full_event, full_event,
+            line3 = self.gtf_string.format(int(e_vals[3]) - edge, e_vals[3], strand, full_event, full_event,
                                            'alternative2')
             yield line3, self.etype
 
-            line4 = self.gtf_string.format(e_vals[5], int(e_vals[5]) + edge, strand, full_event, full_event,
+            line4 = self.gtf_string.format(e_vals[6], int(e_vals[6]) + edge, strand, full_event, full_event,
                                            'alternative2')
             yield line4, self.etype
 
@@ -245,8 +256,8 @@ class ALTL(Event):
         gene = self.gene
         for neg1, neg2, neg3 in self.negative_coords:
             if neg3 == coord3 and coord2 < neg1:
-                eventid = '{}:{}:{}-{}:{}:{}-{}:{}'.format(gene.chr, coord1, coord2, coord3,
-                                                           neg1, neg2, neg3, gene.strand)
+                eventid = 'e{}:{}:{}:{}-{}:{}:{}-{}:{}'.format(self.event_count, gene.chr, coord1, coord2, coord3,
+                                                               neg1, neg2, neg3, gene.strand)
                 self.positive_ids[eventid] = self.positive_ids.get(eventid, []) + [transcript]
                 self.negative_ids[eventid] = self.negative_coords[(neg1, neg2, neg3)]
 
@@ -259,19 +270,19 @@ class ALTL(Event):
             full_event = '{}:{}'.format(self.etype, event)
             e_vals = full_event.replace('-', ':').split(':')
 
-            line1 = self.gtf_string.format(e_vals[2], e_vals[3], strand, full_event, full_event,
+            line1 = self.gtf_string.format(e_vals[3], e_vals[4], strand, full_event, full_event,
                                            'alternative1')
             yield line1, self.etype
 
-            line2 = self.gtf_string.format(e_vals[4], int(e_vals[4]) + edge, strand, full_event, full_event,
+            line2 = self.gtf_string.format(e_vals[5], int(e_vals[5]) + edge, strand, full_event, full_event,
                                            'alternative1')
             yield line2, self.etype
 
-            line3 = self.gtf_string.format(e_vals[5], e_vals[6], strand, full_event, full_event,
+            line3 = self.gtf_string.format(e_vals[6], e_vals[7], strand, full_event, full_event,
                                            'alternative2')
             yield line3, self.etype
 
-            line4 = self.gtf_string.format(int(e_vals[7]), int(e_vals[7]) + edge, strand, full_event, full_event,
+            line4 = self.gtf_string.format(int(e_vals[8]), int(e_vals[8]) + edge, strand, full_event, full_event,
                                            'alternative2')
             yield line4, self.etype
 
@@ -313,8 +324,8 @@ class ALTR(Event):
         gene = self.gene
         for neg1, neg2, neg3 in self.negative_coords:
             if neg1 == coord1 and neg2 > coord3:
-                eventid = '{}:{}-{}:{}:{}-{}:{}:{}'.format(gene.chr, coord1, coord2, coord3,
-                                                           neg1, neg2, neg3, gene.strand)
+                eventid = 'e{}:{}:{}-{}:{}:{}-{}:{}:{}'.format(self.event_count, gene.chr, coord1, coord2, coord3,
+                                                               neg1, neg2, neg3, gene.strand)
                 self.positive_ids[eventid] = self.positive_ids.get(eventid, []) + [transcript]
                 self.negative_ids[eventid] = self.negative_coords[(neg1, neg2, neg3)]
 
@@ -327,19 +338,19 @@ class ALTR(Event):
             full_event = '{}:{}'.format(self.etype, event)
             e_vals = full_event.replace('-', ':').split(':')
 
-            line1 = self.gtf_string.format(int(e_vals[2]) - edge, e_vals[2], strand, full_event, full_event,
+            line1 = self.gtf_string.format(int(e_vals[3]) - edge, e_vals[3], strand, full_event, full_event,
                                            'alternative2')
             yield line1, self.etype
 
-            line2 = self.gtf_string.format(e_vals[3], e_vals[4], strand, full_event, full_event,
+            line2 = self.gtf_string.format(e_vals[4], e_vals[5], strand, full_event, full_event,
                                            'alternative2')
             yield line2, self.etype
 
-            line3 = self.gtf_string.format(int(e_vals[2]) - edge, e_vals[2], strand, full_event, full_event,
+            line3 = self.gtf_string.format(int(e_vals[3]) - edge, e_vals[3], strand, full_event, full_event,
                                            'alternative1')
             yield line3, self.etype
 
-            line4 = self.gtf_string.format(e_vals[6], e_vals[7], strand, full_event, full_event,
+            line4 = self.gtf_string.format(e_vals[7], e_vals[8], strand, full_event, full_event,
                                            'alternative1')
             yield line4, self.etype
 
@@ -394,8 +405,8 @@ class MXE(Event):
             mm_t = new_coords[1]
 
             if compare_f == compare_t and mm_f < mm_t:
-                eventid = ('{}:{}-{}:{}-{}:{}-{}:{}-{}:{}'
-                           .format(gene.chr, orig_cord[0], orig_cord[1], orig_cord[2], orig_cord[3],
+                eventid = ('e{}:{}:{}-{}:{}-{}:{}-{}:{}-{}:{}'
+                           .format(self.event_count, gene.chr, orig_cord[0], orig_cord[1], orig_cord[2], orig_cord[3],
                                    new_coords[0], new_coords[1], new_coords[2], new_coords[3], gene.strand))
                 all_events.append([eventid, orig_cord])
         return all_events
@@ -409,27 +420,27 @@ class MXE(Event):
             full_event = '{}:{}'.format(self.etype, event)
             e_vals = full_event.replace('-', ':').split(':')
 
-            line1 = self.gtf_string.format(int(e_vals[2]) - edge, e_vals[2], strand, full_event, full_event,
+            line1 = self.gtf_string.format(int(e_vals[3]) - edge, e_vals[3], strand, full_event, full_event,
                                            'alternative1')
             yield line1, self.etype
 
-            line2 = self.gtf_string.format(e_vals[3], e_vals[4], strand, full_event, full_event,
+            line2 = self.gtf_string.format(e_vals[4], e_vals[5], strand, full_event, full_event,
                                            'alternative1')
             yield line2, self.etype
 
-            line3 = self.gtf_string.format(e_vals[9], int(e_vals[9]) + edge, strand, full_event, full_event,
+            line3 = self.gtf_string.format(e_vals[10], int(e_vals[10]) + edge, strand, full_event, full_event,
                                            'alternative1')
             yield line3, self.etype
 
-            line4 = self.gtf_string.format(int(e_vals[2]) - edge, e_vals[2], strand, full_event, full_event,
+            line4 = self.gtf_string.format(int(e_vals[3]) - edge, e_vals[3], strand, full_event, full_event,
                                            'alternative2')
             yield line4, self.etype
 
-            line5 = self.gtf_string.format(e_vals[7], e_vals[8], strand, full_event, full_event,
+            line5 = self.gtf_string.format(e_vals[8], e_vals[7], strand, full_event, full_event,
                                            'alternative2')
             yield line5, self.etype
 
-            line6 = self.gtf_string.format(e_vals[9], int(e_vals[9]) + edge, strand, full_event, full_event,
+            line6 = self.gtf_string.format(e_vals[10], int(e_vals[10]) + edge, strand, full_event, full_event,
                                            'alternative2')
             yield line6, self.etype
 
@@ -449,8 +460,8 @@ class RI(Event):
         for i in range(len(exons) - 1):
             firstexon = exons[i]
             secondexon = exons[i + 1]
-            eventid = '{}:{}:{}-{}:{}:{}'.format(gene.chr, firstexon[0], firstexon[1], secondexon[0],
-                                                 secondexon[1], gene.strand)
+            eventid = 'e{}:{}:{}:{}-{}:{}:{}'.format(self.event_count, gene.chr, firstexon[0], firstexon[1], 
+                                                     secondexon[0], secondexon[1], gene.strand)
 
             self.negative_ids[eventid] = self.negative_ids.get(eventid, []) + [transcript]
             search_coord = (firstexon[0], secondexon[1])
@@ -476,13 +487,13 @@ class RI(Event):
             full_event = '{}:{}'.format(self.etype, event)
             e_vals = full_event.replace('-', ':').split(':')
 
-            line1 = self.gtf_string.format(e_vals[2], e_vals[3], strand, full_event, full_event, 'alternative2')
+            line1 = self.gtf_string.format(e_vals[3], e_vals[4], strand, full_event, full_event, 'alternative2')
             yield line1, self.etype
 
-            line2 = self.gtf_string.format(e_vals[4], e_vals[5], strand, full_event, full_event, 'alternative2')
+            line2 = self.gtf_string.format(e_vals[5], e_vals[6], strand, full_event, full_event, 'alternative2')
             yield line2, self.etype
 
-            line3 = self.gtf_string.format(e_vals[2], e_vals[5], strand, full_event, full_event, 'alternative1')
+            line3 = self.gtf_string.format(e_vals[3], e_vals[6], strand, full_event, full_event, 'alternative1')
             yield line3, self.etype
 
 
@@ -505,8 +516,8 @@ class SE(Event):
             firstexon = exons[i]
             midexon = exons[i + 1]
             lastexon = exons[i + 2]
-            eventid = '{}:{}-{}:{}-{}:{}'.format(gene.chr, firstexon[1], midexon[0],
-                                                 midexon[1], lastexon[0], gene.strand)
+            eventid = 'e{}:{}:{}-{}:{}-{}:{}'.format(self.event_count, gene.chr, firstexon[1], midexon[0],
+                                                     midexon[1], lastexon[0], gene.strand)
 
             self.positive_ids[eventid] = self.positive_ids.get(eventid, []) + [transcript]
             search_coord = (firstexon[1], lastexon[0])
@@ -536,22 +547,22 @@ class SE(Event):
             full_event = '{}:{}'.format(self.etype, event)
             e_vals = full_event.replace('-', ':').split(':')
 
-            line1 = self.gtf_string.format(int(e_vals[2]) - edge, e_vals[2], strand, full_event, full_event,
+            line1 = self.gtf_string.format(int(e_vals[3]) - edge, e_vals[3], strand, full_event, full_event,
                                            'alternative2')
             yield line1, self.etype
 
-            line2 = self.gtf_string.format(e_vals[5], int(e_vals[5]) + edge, strand, full_event, full_event,
+            line2 = self.gtf_string.format(e_vals[6], int(e_vals[6]) + edge, strand, full_event, full_event,
                                            'alternative2')
             yield line2, self.etype
 
-            line3 = self.gtf_string.format(int(e_vals[2]) - edge, e_vals[2], strand, full_event, full_event,
+            line3 = self.gtf_string.format(int(e_vals[3]) - edge, e_vals[3], strand, full_event, full_event,
                                            'alternative1')
             yield line3, self.etype
 
-            line4 = self.gtf_string.format(e_vals[3], e_vals[4], strand, full_event, full_event, 'alternative1')
+            line4 = self.gtf_string.format(e_vals[4], e_vals[5], strand, full_event, full_event, 'alternative1')
             yield line4, self.etype
 
-            line5 = self.gtf_string.format(e_vals[5], int(e_vals[5]) + edge, strand, full_event, full_event,
+            line5 = self.gtf_string.format(e_vals[6], int(e_vals[6]) + edge, strand, full_event, full_event,
                                            'alternative1')
             yield line5, self.etype
 
