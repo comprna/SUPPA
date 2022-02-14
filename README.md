@@ -549,7 +549,7 @@ List of options available:
 
 - **-a** | **--area**: Integer indicating the number of points in the local area of the delta PSI - average TPM distribution. (Default: 1000).
 
-- **-l** | **--lower-bound**:  Lower-bound for the absolute delta PSI value to test for significance. Events with less than this delta PSI will not be tested. (Default: 0).
+- **-l** | **--lower-bound**:  Lower-bound for the absolute delta PSI value to test for significance. Events with less than this delta PSI will not be tested. (Default: 0). (Note: it is only implemented in the empirical method).
 
 - **-pa** | **--paired**: Indicates if replicates across conditions are paired.
 
