@@ -15,6 +15,12 @@ import logging
 from lib.diff_tools import multiple_conditions_analysis
 from argparse import *
 
+import collections
+
+import random
+import numpy as np
+random.seed(10)
+np.random.seed(10)
 
 description = \
     "Description:\n" + \
@@ -141,7 +147,7 @@ parser.add_argument("-mo", "--mode", default="INFO",
 
 def create_path(lst):
 
-    temp_lst = []
+    temp_lst = collections.deque()
     for fl in lst:
         if not os.path.isabs(fl):
             fl_path = os.getcwd()+"/"+fl
@@ -149,6 +155,7 @@ def create_path(lst):
         else:
             temp_lst.append(fl)
 
+    # temp_lst = [os.getcwd()+"/"+fl if not os.path.isabs(fl) else f1 for fl in lst]
     return temp_lst
 
 
