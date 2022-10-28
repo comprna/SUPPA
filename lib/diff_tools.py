@@ -25,6 +25,21 @@ from scipy.stats import wilcoxon, mannwhitneyu
 from statsmodels.sandbox.stats.multicomp import multipletests
 from statsmodels.distributions.empirical_distribution import ECDF
 
+import collections
+import asyncio
+import nest_asyncio
+nest_asyncio.apply()
+
+
+import random
+random.seed(10)
+state = random.getstate()
+np.random.seed(10)
+
+import gc
+import itertools
+from multiprocessing import Pool
+
 
 def progressbar(prefix, i, lst_len):
     print(prefix, " ", "%d / %d. " % (i+1, lst_len), "%.2f%% completed." % ((i/lst_len)*100), end="\r", flush=True)
@@ -145,11 +160,11 @@ def get_events_transcripts(ioe):
 
 def get_tpm_values(tpm1_values, tpm2_values, transcripts_values):
 
-    discarded_transcript_events = []
+    discarded_transcript_events = collections.deque()
     tpm_values = defaultdict(list)
     for tpm_dt in (tpm1_values, tpm2_values):
         for event in transcripts_values:
-            transcript_vals = []
+            transcript_vals = collections.deque()
             for transcript in transcripts_values[event]:
                 try:
                     transcript_vals.append(tpm_dt[transcript])
@@ -170,7 +185,7 @@ def calculate_transcript_abundance(tpm_values, tpm_th):
     temp_between_conditions_logtpm = defaultdict(list)
     for event in tpm_values:
 
-        conditions_average_logtpm = []
+        conditions_average_logtpm = collections.deque()
         for transcript_vals in tpm_values[event]:
 
             # Group the TPMs according to their replicate of origin
@@ -232,9 +247,9 @@ def get_closest_number(lst, n):
     before = lst[pos - 1]
     after = lst[pos]
     if after - n < n - before:
-        return after
+        return pos
     else:
-        return before
+        return pos - 1
 
 
 def slice_list(lst, index, slice_len):
@@ -258,14 +273,20 @@ def slice_list(lst, index, slice_len):
         left_bound = diff
         right_bound = index + half_len + 1
 
-    local_dpsi = lst[left_bound:right_bound]
+    try:
+        local_dpsi = lst[int(left_bound):int(right_bound)]
+    except Exception as e:
+        print(left_bound)
+        print(right_bound)
+        print(e)
+        raise
 
     return local_dpsi
 
 
 def calculate_empirical_pvalue(local_area, dpsi_abs_value):
 
-    abs_local_area = [abs(val) for val in local_area]
+    abs_local_area = np.abs(local_area)
 
     ecdf = ECDF(abs_local_area)
 
@@ -276,86 +297,101 @@ def calculate_empirical_pvalue(local_area, dpsi_abs_value):
 
 
 def calculate_between_conditions_distribution(cond1, cond2, tpm1, tpm2, ioe, save_tpm, median, tpm_th, nan_th, output):
+    gc.collect()
+    cond1_psi_values = create_dict(cond1)
+    cond2_psi_values = create_dict(cond2)
+    psi_values = get_psi_values(cond1_psi_values, cond2_psi_values)
+    print('calculate_delta_psi')
+    gc.collect()
+    dpsi_abs_values, dpsi_values, discarded_events = calculate_delta_psi(psi_values, median, nan_th)
+    print('get_events_transcripts')
+    transcripts_values = get_events_transcripts(ioe)
+    gc.collect()
+    tpm1_values = create_dict(tpm1)
+    tpm2_values = create_dict(tpm2)
+    print('get_tpm_values')
+    gc.collect()
+    tpm_values = get_tpm_values(tpm1_values, tpm2_values, transcripts_values)
+    print('calculate_transcript_abundance')
+    between_conditions_avglogtpm = calculate_transcript_abundance(tpm_values, tpm_th)
 
-        cond1_psi_values = create_dict(cond1)
-        cond2_psi_values = create_dict(cond2)
-        psi_values = get_psi_values(cond1_psi_values, cond2_psi_values)
+    if save_tpm:
+        #Save between_conditions_avglogtpm object
+        print("Saving between_conditions_avglogtpm...")
+        output = output + "_avglogtpm.tab"
+        outFile = open(output, 'w')
+        for key in between_conditions_avglogtpm.keys():
+            line = key + "\t" + str(between_conditions_avglogtpm[key]) + "\n"
+            outFile.write(line)
+        outFile.close()
 
-        dpsi_abs_values, dpsi_values, discarded_events = calculate_delta_psi(psi_values, median, nan_th)
+        print("Saved "+output)
 
-        transcripts_values = get_events_transcripts(ioe)
+    between_conditions_absdpsi_logtpm = merge_dict(dpsi_abs_values, between_conditions_avglogtpm)
 
-        tpm1_values = create_dict(tpm1)
-        tpm2_values = create_dict(tpm2)
-        tpm_values = get_tpm_values(tpm1_values, tpm2_values, transcripts_values)
-
-        between_conditions_avglogtpm = calculate_transcript_abundance(tpm_values, tpm_th)
-
-        if save_tpm:
-            #Save between_conditions_avglogtpm object
-            print("Saving between_conditions_avglogtpm...")
-            output = output + "_avglogtpm.tab"
-            outFile = open(output, 'w')
-            for key in between_conditions_avglogtpm.keys():
-                line = key + "\t" + str(between_conditions_avglogtpm[key]) + "\n"
-                outFile.write(line)
-            outFile.close()
-
-            print("Saved "+output)
-
-        between_conditions_absdpsi_logtpm = merge_dict(dpsi_abs_values, between_conditions_avglogtpm)
-
-        return between_conditions_absdpsi_logtpm, psi_values, tpm_values, dpsi_abs_values, dpsi_values, discarded_events
+    return between_conditions_absdpsi_logtpm, psi_values, tpm_values, dpsi_abs_values, dpsi_values, discarded_events
 
 
-def create_replicates_distribution(between_conditions_distribution, psi_dict, tpm_dict):
 
-    unsorted_replicates_distribution, unsorted_rep_dist_for_plot = ([] for _ in range(2))
-    for event in between_conditions_distribution.keys():
-        conds_psi_rep_tpms = list(zip(psi_dict[event], tpm_dict[event]))
+async def rep_dist_single_event(i, len_iter_dist, event, psi_dict, tpm_dict, state):
+    progressbar("Create replicates distribution:", i, len_iter_dist)
+    random.setstate(state)
+    conds_psi_rep_tpms = list(zip(psi_dict[event], tpm_dict[event]))
+    results = collections.deque()
+    for cond_psi_trans in conds_psi_rep_tpms:
+        psis = cond_psi_trans[0]
+        trans_tpms = cond_psi_trans[1]
 
-        for cond_psi_trans in conds_psi_rep_tpms:
-            psis = cond_psi_trans[0]
-            trans_tpms = cond_psi_trans[1]
+        # Group the TPMs according to their replicate of origin
+        rep_trans = list(zip(*trans_tpms))
 
-            # Group the TPMs according to their replicate of origin
-            rep_trans = list(zip(*trans_tpms))
+        rep_psi_trans_lst = list(zip(psis, rep_trans))
 
-            rep_psi_trans_lst = list(zip(psis, rep_trans))
+        cond_psi_trans_lst = collections.deque()
+        for psi_trans in rep_psi_trans_lst:
+            rep_psi_val = psi_trans[0]
+            trans = psi_trans[1]
 
-            cond_psi_trans_lst = []
-            for psi_trans in rep_psi_trans_lst:
-                rep_psi_val = psi_trans[0]
-                trans = psi_trans[1]
+            try:
+                rep_logtpm = math.log10(sum(trans))
+                rep_psi_logtpm_pair = (rep_psi_val, rep_logtpm)
+                cond_psi_trans_lst.append(rep_psi_logtpm_pair)
 
-                try:
-                    rep_logtpm = math.log10(sum(trans))
-                    rep_psi_logtpm_pair = (rep_psi_val, rep_logtpm)
-                    cond_psi_trans_lst.append(rep_psi_logtpm_pair)
+            except Exception as e:
+                print(e)
+                pass
 
-                except Exception as e:
-                    pass
+        psi_trans_paired = list(combinations(cond_psi_trans_lst, r=2))
 
-            psi_trans_paired = list(combinations(cond_psi_trans_lst, r=2))
+        for pair in psi_trans_paired:
+            # A rep_pair contains (replicate_psi_value, replicate_avg_log10_tpm_value)
+            rep1_pair = pair[0]
+            rep2_pair = pair[1]
 
-            for pair in psi_trans_paired:
-                # A rep_pair contains (replicate_psi_value, replicate_avg_log10_tpm_value)
-                rep1_pair = pair[0]
-                rep2_pair = pair[1]
+            try:
+                rep_delta_psi = rep2_pair[0] - rep1_pair[0]
+                rep_pair_avg_logtpm = (rep1_pair[1] + rep2_pair[1]) * 0.5
+                results.append((rep_delta_psi, rep_pair_avg_logtpm))
+            
+            except Exception as e:
+                print(e)
+                pass
+    return np.array(results)
 
-                try:
-                    rep_delta_psi = rep2_pair[0] - rep1_pair[0]
-                    rep_pair_avg_logtpm = (rep1_pair[1] + rep2_pair[1]) * 0.5
-                    unsorted_replicates_distribution.append((rep_delta_psi, rep_pair_avg_logtpm))
 
-                    unsorted_rep_dist_for_plot.append((event, rep_delta_psi, rep_pair_avg_logtpm))
-
-                except Exception as e:
-                    pass
-
+def create_replicates_distribution(between_conditions_distribution, psi_dict, tpm_dict, state):
+    random.setstate(state)
+    gc.collect()
+    len_iter_dist = len(between_conditions_distribution)
+    loop = asyncio.get_event_loop()  
+    looper = asyncio.gather(*[rep_dist_single_event(i, len_iter_dist, event, psi_dict, tpm_dict, state) for i, event in enumerate(between_conditions_distribution)]) 
+    unsorted_replicates_distribution = loop.run_until_complete(looper)                                   
+    unsorted_replicates_distribution_fix = np.vstack(unsorted_replicates_distribution)
+    gc.collect()
+    print('Collating replicates distribution')
     # It's important to sort because get_closest_number assume a sorted list
-    replicates_distribution = sorted(unsorted_replicates_distribution, key=lambda x: x[1])
-
+    replicates_distribution = unsorted_replicates_distribution_fix[unsorted_replicates_distribution_fix[:,1].argsort()]
+    
     # List converted to numpy array for better performance
     return np.array(replicates_distribution)
 
@@ -363,38 +399,44 @@ def create_replicates_distribution(between_conditions_distribution, psi_dict, tp
 def get_local_distribution(ev_logtpm, replicates_distribution, replicates_logtpms, windows_len):
 
     close_rep_logtpm = get_closest_number(replicates_logtpms, ev_logtpm)
-    local_dist = slice_list(replicates_distribution, replicates_logtpms.index(close_rep_logtpm), windows_len)
+    local_dist = slice_list(replicates_distribution, close_rep_logtpm, windows_len)
 
-    return local_dist
+    # return local_dist
+    return np.array(local_dist)
+
+
+async def pval_single_event(i, event, lst_len, between_conditions_distribution, 
+                            replicates_distribution, area, abs_dpsi_dict, cutoff, replicates_logtpms, state):
+    progressbar("Calculating events empirical p-value:", i, lst_len) 
+    random.setstate(state)
+    between_cond_obs_dpsi = abs_dpsi_dict[event]
+    ev_logtpm = between_conditions_distribution[event][1]
+    local_dist = get_local_distribution(ev_logtpm, replicates_distribution, replicates_logtpms, area)
+    local_dpsi = local_dist[:,0]
+    if -cutoff < between_cond_obs_dpsi < cutoff:
+        event_pval = 1.0
+    else:
+        event_pval = calculate_empirical_pvalue(local_dpsi, between_cond_obs_dpsi)
+    return(event_pval,event)
+
 
 
 def calculate_events_pvals(between_conditions_distribution,
-                           replicates_distribution, area, abs_dpsi_dict, cutoff):
+                           replicates_distribution, area, abs_dpsi_dict, cutoff, state):
 
     replicates_logtpms = [event[1] for event in replicates_distribution]
 
     lst_len = len(between_conditions_distribution)
+    random.setstate(state)
+    gc.collect()
 
-    uncorrected_pvals, event_lst = ([] for _ in range(2))
-    for i, event in enumerate(between_conditions_distribution):
-
-        progressbar("Calculating events empirical p-value:", i, lst_len)
-
-        between_cond_obs_dpsi = abs_dpsi_dict[event]
-        ev_logtpm = between_conditions_distribution[event][1]
-        local_dist = get_local_distribution(ev_logtpm, replicates_distribution, replicates_logtpms, area)
-        local_dpsi = [e[0] for e in local_dist]
-
-        if -cutoff < between_cond_obs_dpsi < cutoff:
-            event_pval = 1.0
-            uncorrected_pvals.append(event_pval)
-            event_lst.append(event)
-
-        else:
-            event_pval = calculate_empirical_pvalue(local_dpsi, between_cond_obs_dpsi)
-            uncorrected_pvals.append(event_pval)
-            event_lst.append(event)
-
+    loop = asyncio.get_event_loop()  
+    looper = asyncio.gather(*[pval_single_event(i, event, lst_len, between_conditions_distribution, 
+                        replicates_distribution, area, abs_dpsi_dict, cutoff, replicates_logtpms, state) for i, event in enumerate(between_conditions_distribution)]) 
+    results = loop.run_until_complete(looper) 
+    uncorrected_pvals = list(zip(*results))[0]
+    event_lst = list(zip(*results))[1]
+    
     print("\nDone!\n")
 
     return event_lst, uncorrected_pvals
@@ -407,7 +449,7 @@ def nan_eliminator(lst1, lst2, paired):
         try:
             l1, l2 = zip(*[e for e in z if not math.isnan(e[0]) and not math.isnan(e[1])])
         except:
-            l1, l2 = [], []
+            l1, l2 = collections.deque(), collections.deque()
     else:
         l1 = [e for e in lst1 if not math.isnan(e)]
         l2 = [e for e in lst2 if not math.isnan(e)]
@@ -455,10 +497,7 @@ def merge_temp_output_files(output):
     else:
         current_path = os.getcwd()+"/"
 
-    dpsi_files = []
-    for fl in os.listdir(current_path):
-        if ".dpsi.temp." in fl:
-            dpsi_files.append(current_path+fl)
+    dpsi_files = [current_path+fl for fl in os.listdir(current_path) if ".dpsi.temp." in fl]
 
     dpsi_files.sort(key=lambda x: x[-1])
 
@@ -490,7 +529,7 @@ def merge_temp_output_files(output):
 
 def write_psivec_file(psi_lst, output):
 
-    df_lst = []
+    df_lst = collections.deque()
     for fl in psi_lst:
         df = pd.read_table(fl, sep='\t', skiprows=[0], index_col=0, header=None)
 
@@ -516,15 +555,15 @@ def write_psivec_file(psi_lst, output):
     return os.path.abspath("%s.psivec" % output)
 
 
-def empirical_test(cond1, tpm1, cond2, tpm2, ioe, area, cutoff, save_tpm, median, tpm_th, nan_th, output):
-
+def empirical_test(cond1, tpm1, cond2, tpm2, ioe, area, cutoff, save_tpm, median, tpm_th, nan_th, output, state):
+    print('calculate_between_conditions_distribution')
     between_conditions_distribution, psi_dict, tpm_dict, abs_dpsi_dict, dpsi_vals, discarded_dt \
         = calculate_between_conditions_distribution(cond1, cond2, tpm1, tpm2, ioe, save_tpm, median, tpm_th, nan_th, output)
-
-    replicates_distribution = create_replicates_distribution(between_conditions_distribution, psi_dict, tpm_dict)
+    print('create_replicates_distribution')
+    replicates_distribution = create_replicates_distribution(between_conditions_distribution, psi_dict, tpm_dict, state)
 
     event_lst, uncorrected_pvals = calculate_events_pvals(between_conditions_distribution,
-                                              replicates_distribution, area, abs_dpsi_dict, cutoff)
+                                              replicates_distribution, area, abs_dpsi_dict, cutoff, state)
 
     return event_lst, uncorrected_pvals, dpsi_vals, discarded_dt
 
@@ -540,7 +579,7 @@ def classical_test(cond1, cond2, paired, median, nan_th):
     cond2_dict = create_dict(cond2)
     psi_dict = get_psi_values(cond1_dict, cond2_dict)
 
-    uncorrected_pvals, event_lst = ([] for _ in range(2))
+    uncorrected_pvals, event_lst = (collections.deque() for _ in range(2))
     for i in psi_dict:
         l1, l2 = nan_eliminator(psi_dict[i][0], psi_dict[i][1], paired)
         try:
@@ -652,10 +691,9 @@ def multiple_conditions_analysis(method, psi_lst, tpm_lst, ioe, area, cutoff, pa
               "" % (cond1_name, cond2_name))
 
         if method == 'empirical':
-            #event_lst, uncorrected_pvals, dpsi_vals, discarded_dt = empirical_test(cond1, tpm1, cond2, tpm2,ioe, area, cutoff)
             event_lst, uncorrected_pvals, dpsi_vals, discarded_dt = empirical_test(cond1, tpm1, cond2, tpm2, ioe, area,
                                                                                    cutoff, save_tpm, median, tpm_th,
-                                                                                   nan_th, output)
+                                                                                   nan_th, output, state)
             corrected_pvals_dict = {k: v for k, v in zip(event_lst, uncorrected_pvals)}
 
         elif method == 'classical':
