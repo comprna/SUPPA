@@ -40,7 +40,6 @@ import gc
 import itertools
 from multiprocessing import Pool
 
-
 def progressbar(prefix, i, lst_len):
     print(prefix, " ", "%d / %d. " % (i+1, lst_len), "%.2f%% completed." % ((i/lst_len)*100), end="\r", flush=True)
 
@@ -247,8 +246,10 @@ def get_closest_number(lst, n):
     before = lst[pos - 1]
     after = lst[pos]
     if after - n < n - before:
+        # return after
         return pos
     else:
+        # return before
         return pos - 1
 
 
@@ -275,9 +276,8 @@ def slice_list(lst, index, slice_len):
 
     try:
         local_dpsi = lst[int(left_bound):int(right_bound)]
+#         local_dpsi = lst[left_bound:right_bound]
     except Exception as e:
-        print(left_bound)
-        print(right_bound)
         print(e)
         raise
 
@@ -286,6 +286,7 @@ def slice_list(lst, index, slice_len):
 
 def calculate_empirical_pvalue(local_area, dpsi_abs_value):
 
+    # abs_local_area = [abs(val) for val in local_area]
     abs_local_area = np.abs(local_area)
 
     ecdf = ECDF(abs_local_area)
@@ -298,6 +299,7 @@ def calculate_empirical_pvalue(local_area, dpsi_abs_value):
 
 def calculate_between_conditions_distribution(cond1, cond2, tpm1, tpm2, ioe, save_tpm, median, tpm_th, nan_th, output):
     gc.collect()
+    
     cond1_psi_values = create_dict(cond1)
     cond2_psi_values = create_dict(cond2)
     psi_values = get_psi_values(cond1_psi_values, cond2_psi_values)
@@ -314,7 +316,6 @@ def calculate_between_conditions_distribution(cond1, cond2, tpm1, tpm2, ioe, sav
     tpm_values = get_tpm_values(tpm1_values, tpm2_values, transcripts_values)
     print('calculate_transcript_abundance')
     between_conditions_avglogtpm = calculate_transcript_abundance(tpm_values, tpm_th)
-
     if save_tpm:
         #Save between_conditions_avglogtpm object
         print("Saving between_conditions_avglogtpm...")
@@ -331,6 +332,9 @@ def calculate_between_conditions_distribution(cond1, cond2, tpm1, tpm2, ioe, sav
 
     return between_conditions_absdpsi_logtpm, psi_values, tpm_values, dpsi_abs_values, dpsi_values, discarded_events
 
+
+def runfn(i, len_iter_dist, event, psi_dict, tpm_dict, state):
+    return asyncio.run(rep_dist_single_event(i, len_iter_dist, event, psi_dict, tpm_dict, state))
 
 
 async def rep_dist_single_event(i, len_iter_dist, event, psi_dict, tpm_dict, state):
@@ -379,21 +383,21 @@ async def rep_dist_single_event(i, len_iter_dist, event, psi_dict, tpm_dict, sta
     return np.array(results)
 
 
-def create_replicates_distribution(between_conditions_distribution, psi_dict, tpm_dict, state):
-    random.setstate(state)
-    gc.collect()
-    len_iter_dist = len(between_conditions_distribution)
-    loop = asyncio.get_event_loop()  
-    looper = asyncio.gather(*[rep_dist_single_event(i, len_iter_dist, event, psi_dict, tpm_dict, state) for i, event in enumerate(between_conditions_distribution)]) 
-    unsorted_replicates_distribution = loop.run_until_complete(looper)                                   
-    unsorted_replicates_distribution_fix = np.vstack(unsorted_replicates_distribution)
-    gc.collect()
-    print('Collating replicates distribution')
-    # It's important to sort because get_closest_number assume a sorted list
-    replicates_distribution = unsorted_replicates_distribution_fix[unsorted_replicates_distribution_fix[:,1].argsort()]
+def create_replicates_distribution(between_conditions_distribution, psi_dict, tpm_dict, state, no_cpu):
     
-    # List converted to numpy array for better performance
-    return np.array(replicates_distribution)
+    gc.collect()
+    print('Number of cpus: '+ str(no_cpu), flush = True)
+    pool = Pool(processes=no_cpu)
+    len_iter_dist = len(between_conditions_distribution)
+    loop_items = zip(range(len_iter_dist), itertools.repeat(len_iter_dist), between_conditions_distribution.keys(), itertools.repeat(psi_dict), itertools.repeat(tpm_dict), itertools.repeat(state))
+    unsorted_replicates_distribution = np.vstack(pool.starmap(runfn, loop_items))
+    pool.close()
+    gc.collect()
+    # It's important to sort because get_closest_number assume a sorted list
+    replicates_distribution = unsorted_replicates_distribution[unsorted_replicates_distribution[:,1].argsort()]
+        
+    # replicates_distribution = unsorted_replicates_distribution[pargsort.pargsort(unsorted_replicates_distribution[:,1])]
+    return replicates_distribution
 
 
 def get_local_distribution(ev_logtpm, replicates_distribution, replicates_logtpms, windows_len):
@@ -401,7 +405,6 @@ def get_local_distribution(ev_logtpm, replicates_distribution, replicates_logtpm
     close_rep_logtpm = get_closest_number(replicates_logtpms, ev_logtpm)
     local_dist = slice_list(replicates_distribution, close_rep_logtpm, windows_len)
 
-    # return local_dist
     return np.array(local_dist)
 
 
@@ -424,7 +427,7 @@ async def pval_single_event(i, event, lst_len, between_conditions_distribution,
 def calculate_events_pvals(between_conditions_distribution,
                            replicates_distribution, area, abs_dpsi_dict, cutoff, state):
 
-    replicates_logtpms = [event[1] for event in replicates_distribution]
+    replicates_logtpms = replicates_distribution[:,1]
 
     lst_len = len(between_conditions_distribution)
     random.setstate(state)
@@ -555,12 +558,12 @@ def write_psivec_file(psi_lst, output):
     return os.path.abspath("%s.psivec" % output)
 
 
-def empirical_test(cond1, tpm1, cond2, tpm2, ioe, area, cutoff, save_tpm, median, tpm_th, nan_th, output, state):
+def empirical_test(cond1, tpm1, cond2, tpm2, ioe, area, cutoff, save_tpm, median, tpm_th, nan_th, output, state, no_cpu):
     print('calculate_between_conditions_distribution')
     between_conditions_distribution, psi_dict, tpm_dict, abs_dpsi_dict, dpsi_vals, discarded_dt \
         = calculate_between_conditions_distribution(cond1, cond2, tpm1, tpm2, ioe, save_tpm, median, tpm_th, nan_th, output)
     print('create_replicates_distribution')
-    replicates_distribution = create_replicates_distribution(between_conditions_distribution, psi_dict, tpm_dict, state)
+    replicates_distribution = create_replicates_distribution(between_conditions_distribution, psi_dict, tpm_dict, state, no_cpu)
 
     event_lst, uncorrected_pvals = calculate_events_pvals(between_conditions_distribution,
                                               replicates_distribution, area, abs_dpsi_dict, cutoff, state)
@@ -668,8 +671,8 @@ def convert_to_log10pval(dpsi_pval_values, sig_threshold=0.05, dpsi_threshold=0.
 
 
 def multiple_conditions_analysis(method, psi_lst, tpm_lst, ioe, area, cutoff, paired, gene_cor, alpha,
-                                 save_tpm, comb, median, tpm_th, nan_th, output):
-
+                                 save_tpm, comb, median, tpm_th, nan_th, output, no_cpu):
+    
     # Setting logging preferences
     logger = logging.getLogger(__name__)
 
@@ -693,7 +696,7 @@ def multiple_conditions_analysis(method, psi_lst, tpm_lst, ioe, area, cutoff, pa
         if method == 'empirical':
             event_lst, uncorrected_pvals, dpsi_vals, discarded_dt = empirical_test(cond1, tpm1, cond2, tpm2, ioe, area,
                                                                                    cutoff, save_tpm, median, tpm_th,
-                                                                                   nan_th, output, state)
+                                                                                   nan_th, output, state, no_cpu)
             corrected_pvals_dict = {k: v for k, v in zip(event_lst, uncorrected_pvals)}
 
         elif method == 'classical':
