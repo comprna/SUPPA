@@ -127,7 +127,7 @@ parser.add_argument('-nan', '--nan-threshold',
                     nargs=1,
                     type=nan_threshold_type,
                     default=[0.0],
-                    help="Percentage allowed of samples per condition with nan values for returning a DeltaPSI (Default: 0, no missing values allowed).")
+                    help="Proportion of allowed samples per condition with nan values for returning a DeltaPSI (Default: 0, no missing values allowed).")
 
 parser.add_argument('-o', '--output',
                     dest="output",
