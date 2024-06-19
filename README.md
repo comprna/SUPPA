@@ -88,11 +88,7 @@ pip show SUPPA
 
 SUPPA is ready to use. Once downloaded, it can be used directly from the command line by specifying the absolute path to the SUPPA executable (suppa.py).
 
-Another option is via bioconda (thanks to Devon Ryan)
-
-```
-conda install -c bioconda suppa
-```
+**Important:** we have discontinued the conda download, as it is out of sync with the github. **We recommend directly copying the code from github.** The code is ready to use without any additional steps. 
 
 Alternatively, you can obtain the code for the SUPPA2.3 release here:
 https://github.com/comprna/SUPPA/releases/tag/v2.3
