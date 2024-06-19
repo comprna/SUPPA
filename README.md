@@ -78,7 +78,7 @@ If necessary, to install python3 we recommend to download from the official site
 A installation using pip is available using the next command:
 
 ```
-pip install SUPPA==2.4
+pip install SUPPA==2.3
 ```
 By default SUPPA is installed into the Python package library directory. The following command can be executed to obtain the directory location:
 
@@ -90,7 +90,7 @@ SUPPA is ready to use. Once downloaded, it can be used directly from the command
 
 **Important:** we have discontinued the conda download, as it is out of sync with the github. **We recommend directly copying the code from github.** The code is ready to use without any additional steps. 
 
-Alternatively, you can obtain the code for the SUPPA v2.4 release here:
+Alternatively, you can obtain the code for the SUPPA v2.4 latest release here:
 https://github.com/comprna/SUPPA/releases/tag/v2.4
 
 ----------------------------
